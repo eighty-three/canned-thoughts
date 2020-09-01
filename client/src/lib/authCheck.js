@@ -27,7 +27,7 @@ const authCheck = async (ctx) => {
     });
   const response = await request.json();
   if (response.error) {
-    await ky.post(`${api}/settings/logout`, {json: { 'message': 'Log out' }});
+    await ky.post(`${api}/account/logout`, {json: { 'message': 'Log out' }});
     window.location.href=HOST;
   }
 
