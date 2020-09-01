@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import PropTypes from 'prop-types';
 
 import utilStyles from '@/styles/utils.module.css';
 
@@ -7,11 +8,24 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { updateProfileInfo } from '@/lib/profile';
 
-export default function ProfileInfoForm({ name, description, username }) {
+const propTypes = {
+  name: PropTypes.string,
+  description: PropTypes.string,
+  username: PropTypes.string
+};
+
+const ProfileInfoForm = (props) => {
+  const {
+    name,
+    description,
+    username
+  } = props;
+
   const [submitStatus, setSubmitStatus] = useState('Update Profile Info');
   const { register, handleSubmit } = useForm();
 
   const revertStatus = () => setSubmitStatus('Update Profile Info');
+
   const submitShowError = async (data) => {
     const req = await updateProfileInfo(data, username);
     if (req) setSubmitStatus(req);
@@ -31,6 +45,7 @@ export default function ProfileInfoForm({ name, description, username }) {
 
       <div className={`w-75 mx-auto ${utilStyles.pd20}`}>
         <Form className="mx-auto" onSubmit={handleSubmit(submitShowError)}>
+
           <Form.Group controlId='formProfileName'>
             <Form.Label>Name:</Form.Label>
             <Form.Control 
@@ -45,6 +60,7 @@ export default function ProfileInfoForm({ name, description, username }) {
               ref={register({ required: true })} 
             />
           </Form.Group>
+
           <Form.Group controlId='formProfileDescription'>
             <Form.Label>Description:</Form.Label>
             <Form.Control 
@@ -61,12 +77,17 @@ export default function ProfileInfoForm({ name, description, username }) {
               ref={register({ required: true })} 
             />
           </Form.Group>
+
           <Button onBlur={revertStatus} variant="dark" type="submit" block>
             {submitStatus}
           </Button>
+
         </Form>
       </div>
     </>
   );
-}
+};
 
+ProfileInfoForm.propTypes = propTypes;
+
+export default ProfileInfoForm;
