@@ -6,7 +6,7 @@ import styles from '@/components/Navbar.module.css';
 
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
-import { logout } from '@/lib/settings';
+import { logout } from '@/lib/account';
 
 const LoggedIn = ({ username }) => {
   return (
