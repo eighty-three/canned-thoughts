@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import PropTypes from 'prop-types';
 
 import utilStyles from '@/styles/utils.module.css';
 import styles from '@/components/Navbar.module.css';
@@ -7,6 +8,10 @@ import styles from '@/components/Navbar.module.css';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import { logout } from '@/lib/account';
+
+const LoggedInPropTypes = {
+  username: PropTypes.string
+};
 
 const LoggedIn = ({ username }) => {
   return (
@@ -49,6 +54,12 @@ const LoggedIn = ({ username }) => {
   );
 };
 
+LoggedIn.propTypes = LoggedInPropTypes;
+
+const NotLoggedInPropTypes = {
+  redirect: PropTypes.string
+};
+
 const NotLoggedIn = ({ redirect }) => {
   const redirectLink = (redirect)
     ? `/login?redirect=${redirect}`
@@ -69,7 +80,14 @@ const NotLoggedIn = ({ redirect }) => {
   );
 };
 
-export default function NavbarComponent({ username, redirect }) {
+NotLoggedIn.propTypes = NotLoggedInPropTypes;
+
+const NavbarComponentPropTypes = {
+  username: PropTypes.string,
+  redirect: PropTypes.string
+};
+
+const NavbarComponent = ({ username, redirect }) => {
   return (
     <>
       {username 
@@ -79,4 +97,8 @@ export default function NavbarComponent({ username, redirect }) {
       <div className={`${styles.bar}`}></div>
     </>
   );
-}
+};
+
+NavbarComponent.propTypes = NavbarComponentPropTypes;
+
+export default NavbarComponent;
