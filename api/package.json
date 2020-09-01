@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpileOnly src/index.ts",
+    "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpileOnly src/index.ts", // Extra flags necessary because ts-node does not work with paths
     "test": "jest --forceExit --detectOpenHandles --coverage --verbose",
     "lint": "eslint src --ext ts",
     "lint:fix": "eslint src --ext ts --fix",
