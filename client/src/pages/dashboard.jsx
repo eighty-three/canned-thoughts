@@ -2,7 +2,7 @@ import Head from 'next/head';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
-import Layout, { siteTitle } from '@/components/layout';
+import Layout, { siteTitle } from '@/components/Layout';
 import utilStyles from '@/styles/utils.module.css';
 import withAuthComponent from '@/components/withAuth';
 import withAuthServerSideProps from '@/components/withAuthGSSP';
