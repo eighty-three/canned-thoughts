@@ -6,7 +6,7 @@ import utilStyles from '@/styles/utils.module.css';
 import withAuthComponent from '@/components/withAuth';
 import withAuthServerSideProps from '@/components/withAuthGSSP';
 
-import { login } from '@/lib/accounts';
+import { login } from '@/lib/account';
 import CustomAuthForms from '@/components/CustomAuthForms';
 
 function LoginPage() {
