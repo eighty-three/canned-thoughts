@@ -1,7 +1,8 @@
-import Router from 'next/router';
 import ky from 'ky-universal';
 import HOST from '@/lib/host';
 const api = `${HOST}/api/settings`;
+
+import { logout } from './account';
 
 export async function changePassword(data, username) {
   const req = await ky.post(`${api}/password`,
@@ -57,9 +58,3 @@ export async function deleteAccount(data, username) {
 
   await logout();
 }
-
-export async function logout() {
-  await ky.post(`${api}/logout`, {json: { 'message': 'Log out' }});
-  Router.push('/');
-}
-
