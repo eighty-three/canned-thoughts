@@ -1,6 +1,5 @@
 import { RequestHandler } from 'express';
-import { profile } from '../models';
-import { accounts } from '../models';
+import * as profile from './profileModel';
 
 export const updateNameAndDescription: RequestHandler = async (req, res) => {
   const { username, newName, newDescription } = req.body;
@@ -14,16 +13,8 @@ export const getNameAndDescription: RequestHandler = async (req, res) => {
   res.status(200).json(nameAndDescription);
 };
 
-export const getAllProfileInfo: RequestHandler = async (req, res) => {
+export const getProfileInfo: RequestHandler = async (req, res) => {
   const { username } = req.body;
-
-  const user = await accounts.checkUsername(username);
-  if (!user) {
-    res.json({error: 'Profile not found'});
-    return;
-  }
-
-  const profileInfo = await profile.getAllProfileInfo(username);
-  res.status(200).json(profileInfo);
+  const nameAndDescription = await profile.getProfileInfo(username);
+  res.status(200).json(nameAndDescription);
 };
-

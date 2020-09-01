@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express';
-import { settings } from '../models';
 import * as argon2 from 'argon2';
+
+import * as settings from './settingsModel';
 
 export const changePassword: RequestHandler = async (req, res) => {
   const { username, newPassword } = req.body;
@@ -19,10 +20,4 @@ export const deleteAccount: RequestHandler = async (req, res) => {
   const { username } = req.body;
   await settings.deleteAccount(username);
   res.status(200).json({message: 'Account successfully deleted!'});
-};
-
-export const logout: RequestHandler = async (req, res) => {
-  const { message } = req.body;
-  res.clearCookie('auth', { path: '/' });
-  res.status(200).json({ message });
 };

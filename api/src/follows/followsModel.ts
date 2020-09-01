@@ -1,4 +1,4 @@
-import db from './db';
+import db from '@utils/db';
 const accountsTable = 'accounts';
 const followsTable = 'follows';
 
@@ -23,8 +23,6 @@ export const checkIfFollowed = async (
   argAccountsTable: string = accountsTable, 
   argFollowsTable: string = followsTable
 ) => {
-  console.log(followerUsername);
-  console.log(followedUsername);
   return await db.oneOrNone( 
     /*
      * Returns user_id_followed if 
@@ -72,8 +70,4 @@ export const unfollowUser = async (
     ', [argAccountsTable, argFollowsTable, followerUsername, followedUsername]);
 
   await updateFollowersCount(followedUsername, argAccountsTable, argFollowsTable);
-};
-
-export const getFollowersCount = async (profileUsername: string, argAccountsTable: string = accountsTable) => {
-  return await db.one('SELECT followers FROM $1:name WHERE username=$2', [argAccountsTable, profileUsername]);
 };

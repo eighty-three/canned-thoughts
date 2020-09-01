@@ -1,10 +1,10 @@
 import { RequestHandler } from 'express';
-import { accounts } from '../models';
+import * as account from '../account/accountModel';
 
 export const authCheck: RequestHandler = async (req, res) => {
   const { username } = req.body;
 
-  const user = await accounts.checkUsername(username);
+  const user = await account.checkUsername(username);
   if (!user) {
     res.json({error: 'Profile not found'});
     return;
