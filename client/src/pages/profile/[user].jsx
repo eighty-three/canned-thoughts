@@ -1,14 +1,38 @@
 import Head from 'next/head';
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Layout, { siteTitle } from '@/components/layout';
 import { lightAuthCheck } from '@/lib/authCheck';
 
 import Profile from '@/components/Profile';
-import { getNameAndDescription } from '@/lib/profile';
-import { checkIfFollowed, getFollowersCount } from '@/lib/follows';
+import { getProfileInfo } from '@/lib/profile';
+import { checkIfFollowed } from '@/lib/follows';
 
-export default function ProfilePage({ username, profileInfo, profileUsername, followersCount, followStatus, error }) {
+const propTypes = {
+  username: PropTypes.string,
+  profileInfo: PropTypes.shape({
+    username: PropTypes.string,
+    name: PropTypes.string,
+    description: PropTypes.string,
+    followers: PropTypes.number
+  }),
+  profileUsername: PropTypes.string,
+  followStatus: PropTypes.bool,
+  error: PropTypes.string
+};
+
+export default function ProfilePage(props) {
+  const {
+    username, // Logged in user's username
+    profileInfo,
+    profileUsername, // Visited profile's username
+    followStatus,
+    error
+  } = props;
+
+  console.log(profileInfo);
+
   const redirectLink = (profileUsername)
     ? `/profile/${profileUsername}`
     : null;
@@ -20,15 +44,14 @@ export default function ProfilePage({ username, profileInfo, profileUsername, fo
       </Head>
       <section>
         { !error 
-          ? ( /* Fix this, doesn't work properly */
+          ? (
             <Profile username={profileUsername} 
               {...profileInfo} 
-              followers={followersCount} 
-              loggedIn={username} 
+              loggedInUsername={username} 
               followStatus={followStatus} 
             />
           ) : (
-            <h1 className={'text-center'}>PROFILE NOT FOUND</h1>
+            <h1 className={'text-center'}>{error}</h1>
           )
         }
       </section>
@@ -39,7 +62,7 @@ export default function ProfilePage({ username, profileInfo, profileUsername, fo
 export async function getServerSideProps(ctx) {
   const username = await lightAuthCheck(ctx);
   const profileUsername = ctx.params.user;
-  const profileInfo = await getNameAndDescription(profileUsername);
+  const profileInfo = await getProfileInfo(profileUsername);
 
   if (profileInfo.error) {
     return { 
@@ -51,11 +74,9 @@ export async function getServerSideProps(ctx) {
     };
   }
 
-  const followStatus =  (username !== profileUsername) 
+  const followStatus = (username !== profileUsername) 
     ? await checkIfFollowed(username, profileUsername)
     : false;
-
-  const followersCount = await getFollowersCount(profileUsername);
   
   return {
     props: 
@@ -63,8 +84,9 @@ export async function getServerSideProps(ctx) {
         username,
         profileInfo,
         profileUsername,
-        followersCount,
         followStatus
       }
   };
 }
+
+ProfilePage.propTypes = propTypes;
