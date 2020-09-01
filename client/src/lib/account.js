@@ -46,3 +46,7 @@ export async function login(data, prevPath) {
   }
 }
 
+export async function logout() {
+  await ky.post(`${api}/logout`, {json: { 'message': 'Log out' }});
+  Router.push('/');
+}
