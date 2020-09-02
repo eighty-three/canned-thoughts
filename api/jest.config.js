@@ -19,6 +19,9 @@ module.exports = {
     '<rootDir>/src/**/*.ts',
     '!<rootDir>/src/utils/*.ts',
     '!<rootDir>/src/index.ts',
-    '!<rootDir>/src/app.ts'
+    '!<rootDir>/src/app.ts',
+    '!<rootDir>/src/router.ts',
+    '!<rootDir>/src/*/*Router.ts',
+    '!<rootDir>/src/*/*.schema.ts'
   ]
 };
