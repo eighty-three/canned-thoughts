@@ -31,8 +31,6 @@ export default function ProfilePage(props) {
     error
   } = props;
 
-  console.log(profileInfo);
-
   const redirectLink = (profileUsername)
     ? `/profile/${profileUsername}`
     : null;
