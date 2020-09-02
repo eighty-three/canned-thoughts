@@ -1,12 +1,14 @@
 import express from 'express';
+import validator from '@utils/validator';
 const router = express.Router();
 
-//Middleware
 import { authToken, authAccount } from '@authMiddleware/index';
 
 import * as profile from './profileController';
-router.post('/update', authToken.verifyToken, profile.updateNameAndDescription);
-router.post('/getinfo', authAccount.checkIfUsernameExists, profile.getNameAndDescription);
-router.post('/getall', authAccount.checkIfUsernameExists, profile.getProfileInfo);
+import * as profileSchema from './profile.schema';
+
+router.post('/update', validator(profileSchema.updateNameAndDescription, 'body'), authToken.verifyToken, profile.updateNameAndDescription);
+router.post('/getinfo', validator(profileSchema.getNameAndDescription, 'body'), authAccount.checkIfUsernameExists, profile.getNameAndDescription);
+router.post('/getall', validator(profileSchema.getProfileInfo, 'body'), authAccount.checkIfUsernameExists, profile.getProfileInfo);
 
 export default router;
