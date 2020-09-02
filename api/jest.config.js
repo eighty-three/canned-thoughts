@@ -1,10 +1,15 @@
 module.exports = {
+  moduleNameMapper: {
+    '^@utils/(.*)$': '<rootDir>/src/utils/$1',
+    '^@authMiddleware/(.*)$': '<rootDir>/src/authMiddleware/$1'
+  },
+  moduleDirectories: ['src', 'node_modules'],
+  testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   roots: ['<rootDir>/src'],
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
-  testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   testPathIgnorePatterns: [
     '<rootDir>/src/utils/*.ts',
     '<rootDir>/src/index.ts',
