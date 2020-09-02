@@ -2,7 +2,7 @@ import Head from 'next/head';
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Layout, { siteTitle } from '@/components/layout';
+import Layout, { siteTitle } from '@/components/Layout';
 import { lightAuthCheck } from '@/lib/authCheck';
 
 import Profile from '@/components/Profile';
