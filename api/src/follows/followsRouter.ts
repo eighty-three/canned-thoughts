@@ -1,11 +1,13 @@
 import express from 'express';
+import validator from '@utils/validator';
 const router = express.Router();
 
-//Middleware
 import { authToken } from '@authMiddleware/index';
 
 import * as follows from './followsController';
-router.post('/toggle', authToken.verifyToken, follows.toggleFollowStatus);
-router.post('/check', follows.checkIfFollowed);
+import * as followsSchema from './follows.schema';
+
+router.post('/check', validator(followsSchema.checkIfFollowed, 'body'), follows.checkIfFollowed);
+router.post('/toggle', validator(followsSchema.toggleFollowStatus, 'body'), authToken.verifyToken, follows.toggleFollowStatus);
 
 export default router;
