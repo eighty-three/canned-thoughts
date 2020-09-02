@@ -6,18 +6,18 @@ import * as follows from './followsModel';
 const accountsTable = 'accounts_test';
 const followsTable = 'follows_test';
 
-beforeAll(async () => {
-  await account.createAccount('dummy1', 'pw1', accountsTable);
-  await account.createAccount('dummy2', 'pw1', accountsTable);
-});
+describe('testing functions', () => {
+  beforeAll(async () => {
+    await account.createAccount('dummy1', 'pw1', accountsTable);
+    await account.createAccount('dummy2', 'pw1', accountsTable);
+  });
 
-afterAll(async () => {
-  await settings.deleteAccount('dummy1', accountsTable);
-  await settings.deleteAccount('dummy2', accountsTable);
-});
+  afterAll(async () => {
+    await settings.deleteAccount('dummy1', accountsTable);
+    await settings.deleteAccount('dummy2', accountsTable);
+  });
 
-describe('functions without return values', () => {
-  test('follow user', async () => { // updateFollowersCount implicitly tested
+  test('followUser', async () => { // updateFollowersCount implicitly tested
     expect(await profile.getProfileInfo('dummy2', accountsTable)).toEqual(
       expect.objectContaining({
         followers: 0
@@ -33,7 +33,7 @@ describe('functions without return values', () => {
     );
   });
 
-  test('unfollower user', async () => {
+  test('unfollowUser', async () => {
     expect(await profile.getProfileInfo('dummy2', accountsTable)).toEqual(
       expect.objectContaining({
         followers: 1
@@ -48,14 +48,12 @@ describe('functions without return values', () => {
       })
     );
   });
-});
 
-describe('check if followed', () => {
-  test('should fail', async () => {
+  test('checkIfFollowed should fail', async () => {
     expect(await follows.checkIfFollowed('dummy1', 'dummy2', accountsTable, followsTable)).toStrictEqual(null);
   });
 
-  test('should work', async () => {
+  test('checkIfFOllowed should work', async () => {
     expect(await follows.checkIfFollowed('dummy1', 'dummy2', accountsTable, followsTable)).toStrictEqual(null);
 
     await follows.followUser('dummy1', 'dummy2', accountsTable, followsTable);

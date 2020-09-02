@@ -1,17 +1,18 @@
 import * as account from '../account/accountModel';
 import * as settings from '../settings/settingsModel';
 import * as profile from './profileModel';
+
 const testTable = 'accounts_test';
 
-beforeAll(async () => {
-  await account.createAccount('dummy1', 'pw1', testTable);
-});
-
-afterAll(async () => {
-  await settings.deleteAccount('dummy1', testTable);
-});
-
 describe('testing functions', () => {
+  beforeAll(async () => {
+    await account.createAccount('dummy1', 'pw1', testTable);
+  });
+
+  afterAll(async () => {
+    await settings.deleteAccount('dummy1', testTable);
+  });
+
   test('getProfileInfo', async () => {
     expect(await profile.getProfileInfo('dummy1', testTable)).toStrictEqual({
       name: 'dummy1',

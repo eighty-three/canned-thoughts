@@ -3,11 +3,11 @@ import * as settings from './settingsModel';
 
 const testTable = 'accounts_test';
 
-beforeAll(async () => {
-  await account.createAccount('dummy1', 'pw1', testTable);
-});
-
 describe('testing functions', () => {
+  beforeAll(async () => {
+    await account.createAccount('dummy1', 'pw1', testTable);
+  });
+
   test('change password', async () => {
     expect(await account.checkPassword('dummy1', testTable)).toStrictEqual({ password: 'pw1' });
 
