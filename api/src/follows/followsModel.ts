@@ -6,7 +6,7 @@ const updateFollowersCount = async (
   followedUsername: string,
   argAccountsTable: string = accountsTable, 
   argFollowsTable: string = followsTable
-) => {
+): Promise<void> => {
   await db.none( //Separate query with the count function for the number of followers
     'UPDATE $1:name \
 		SET followers= \
@@ -22,7 +22,7 @@ export const checkIfFollowed = async (
   followedUsername: string, 
   argAccountsTable: string = accountsTable, 
   argFollowsTable: string = followsTable
-) => {
+): Promise<{ user_id_followed: number} | null> => {
   return await db.oneOrNone( 
     /*
      * Returns user_id_followed if 
@@ -42,7 +42,7 @@ export const followUser = async (
   followedUsername: string, 
   argAccountsTable: string = accountsTable, 
   argFollowsTable: string = followsTable
-) => {
+): Promise<void> => {
   await db.none(
     /*
      * Values are user_id's of given usernames (followedUsername and followedUsername)
@@ -62,7 +62,7 @@ export const unfollowUser = async (
   followedUsername: string, 
   argAccountsTable: string = accountsTable, 
   argFollowsTable: string = followsTable
-) => {
+): Promise<void> => {
   await db.none( //Same as createNewFollow function where two additional SELECT subqueries are made
     'DELETE FROM $2:name WHERE \
     user_id_follower=(SELECT user_id FROM $1:name WHERE username=$3) AND \
