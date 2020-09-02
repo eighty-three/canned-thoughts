@@ -51,8 +51,8 @@ const ProfileInfoForm = (props) => {
             <Form.Control 
               type="text"
               maxLength={50}
-              pattern="[a-zA-Z0-9 _$!@?-]{1,49}"
-              placeholder="[ a-zA-Z0-9_$!@?- ]{1,49}"
+              pattern="[a-zA-Z0-9_$!@?#-]{1,49}"
+              placeholder="[ a-zA-Z0-9_$!@?#- ]{1,49}"
               spellCheck="false"
               aria-describedby="profileName"
               name="newName"
@@ -68,8 +68,8 @@ const ProfileInfoForm = (props) => {
               rows="5"
               type="text"
               maxLength={160}
-              pattern="[a-z0-9_$!@?-]{1,159}"
-              placeholder="[ a-z0-9_$!@?- ]{1,159}"
+              pattern="[a-z0-9_$!@?#-]{1,159}"
+              placeholder="[ a-z0-9_$!@?#- ]{1,159}"
               spellCheck="false"
               aria-describedby="profileDescription"
               name="newDescription"
