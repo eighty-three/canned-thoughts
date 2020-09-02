@@ -1,7 +1,13 @@
 import React, { useEffect } from 'react';
 import Router, { useRouter } from 'next/router';
+import PropTypes from 'prop-types';
 
-function RedirectComponent({ loggedIn, protectRoute }) {
+const RedirectComponentPropTypes = {
+  loggedIn: PropTypes.bool,
+  protectRoute: PropTypes.bool
+};
+
+const RedirectComponent = ({ loggedIn, protectRoute }) => {
   useEffect(() => {
     Router.replace(newPath);
   }, []);
@@ -20,9 +26,11 @@ function RedirectComponent({ loggedIn, protectRoute }) {
   return (
     <h1 className="text-center">{loadingText}</h1>
   );
-}
+};
 
-export default function withAuthComponent(Component, redirectAction) {
+RedirectComponent.propTypes = RedirectComponentPropTypes;
+
+const withAuthComponent = (Component, redirectAction) => {
   const Authenticated = ({ username, data }) => {
     if (redirectAction === 'loggedIn' && username) {
       return <RedirectComponent loggedIn/>;
@@ -35,5 +43,14 @@ export default function withAuthComponent(Component, redirectAction) {
     return <Component {...data.props}/>;
   };
 
+  Authenticated.propTypes = {
+    username: PropTypes.string,
+    data: PropTypes.shape({
+      props: PropTypes.any
+    })
+  };
+
   return Authenticated;
-}
+};
+
+export default withAuthComponent;
