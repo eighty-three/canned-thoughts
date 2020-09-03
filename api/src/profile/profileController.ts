@@ -15,6 +15,6 @@ export const getNameAndDescription: RequestHandler = async (req, res) => {
 
 export const getProfileInfo: RequestHandler = async (req, res) => {
   const { username } = req.body;
-  const nameAndDescription = await profile.getProfileInfo(username);
-  res.status(200).json(nameAndDescription);
+  const profileInfo = await profile.getProfileInfo(username);
+  res.status(200).json(profileInfo);
 };
