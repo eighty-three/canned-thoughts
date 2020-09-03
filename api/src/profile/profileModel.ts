@@ -4,17 +4,18 @@ const accountsTable = 'accounts';
 interface IProfileInfo {
   name: string,
   description: string,
-  followers: number
+  followers: number,
+  date: number
 }
 
-type INameAndDescription = Omit<IProfileInfo, 'followers'>;
+type INameAndDescription = Omit<IProfileInfo, 'followers'|'date'>;
 
 export const getProfileInfo = async (
   username: string, 
   argAccountsTable: string = accountsTable
 ): Promise<IProfileInfo> => {
   return await db.one(
-    'SELECT name, description, followers FROM $1:name WHERE username=$2 \
+    'SELECT name, description, followers, date FROM $1:name WHERE username=$2 \
     ', [argAccountsTable, username]);
 };
 
