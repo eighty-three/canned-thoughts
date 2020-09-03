@@ -22,7 +22,7 @@ export const checkIfFollowed = async (
   followedUsername: string, 
   argAccountsTable: string = accountsTable, 
   argFollowsTable: string = followsTable
-): Promise<{ user_id_followed: number} | null> => {
+): Promise<{ user_id_followed: number } | null> => {
   return await db.oneOrNone( 
     /*
      * Returns user_id_followed if 
