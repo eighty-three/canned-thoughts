@@ -1,31 +1,36 @@
 import db from '@utils/db';
-const accountsTable = 'accounts';
+import { PreparedStatement as PS } from 'pg-promise';
 
 export const createAccount = async (
   username: string, 
-  hash: string, 
-  argAccountsTable: string = accountsTable
+  hash: string
 ): Promise<void> => {
-  const input = [username, hash, username];
-  await db.none(
-    'INSERT INTO $1:name (username, password, name) \
-    VALUES ($2:csv)', [argAccountsTable, input]);
+  const query = new PS({ name: 'create-account', text: '\
+    INSERT INTO accounts (username, password, name) VALUES ($1, $2, $3)'
+  });
+
+  query.values = [username, hash, username];
+  await db.none(query);
 };
 
 export const checkUsername = async (
-  username: string, 
-  argAccountsTable: string = accountsTable
+  username: string
 ): Promise<{ username: string } | null> => {
-  return await db.oneOrNone(
-    'SELECT username FROM $1:name WHERE username=$2 \
-    ', [argAccountsTable, username]);
+  const query = new PS({ name: 'check-username', text: '\
+    SELECT username FROM accounts WHERE username=$1'
+  });
+
+  query.values = [username];
+  return await db.oneOrNone(query);
 };
 
 export const checkPassword = async (
-  username: string, 
-  argAccountsTable: string = accountsTable
+  username: string
 ): Promise<{ password: string } | null> => {
-  return await db.oneOrNone(
-    'SELECT password FROM $1:name WHERE username=$2 \
-    ', [argAccountsTable, username]);
+  const query = new PS({ name: 'check-password', text: '\
+    SELECT password FROM accounts WHERE username=$1'
+  });
+
+  query.values = [username];
+  return await db.oneOrNone(query);
 };

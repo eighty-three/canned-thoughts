@@ -1,5 +1,5 @@
 import db from '@utils/db';
-const accountsTable = 'accounts';
+import { PreparedStatement as PS } from 'pg-promise';
 
 interface IProfileInfo {
   name: string,
@@ -11,32 +11,36 @@ interface IProfileInfo {
 type INameAndDescription = Omit<IProfileInfo, 'followers'|'date'>;
 
 export const getProfileInfo = async (
-  username: string, 
-  argAccountsTable: string = accountsTable
+  username: string
 ): Promise<IProfileInfo> => {
-  return await db.one(
-    'SELECT name, description, followers, date FROM $1:name WHERE username=$2 \
-    ', [argAccountsTable, username]);
+  const query = new PS({ name: 'get-profile-info', text: '\
+    SELECT name, description, followers, date FROM accounts WHERE username=$1'
+  });
+
+  query.values = [username];
+  return await db.one(query);
 };
 
 export const getNameAndDescription = async (
-  username: string, 
-  argAccountsTable: string = accountsTable
+  username: string
 ): Promise<INameAndDescription> => {
-  return await db.one(
-    'SELECT name, description FROM $1:name WHERE username=$2 \
-    ', [argAccountsTable, username]);
+  const query = new PS({ name: 'get-name-description', text: '\
+    SELECT name, description FROM accounts WHERE username=$1'
+  });
+
+  query.values = [username];
+  return await db.one(query);
 };
 
 export const updateNameAndDescription = async (
   username: string, 
   newName: string, 
-  newDescription: string, 
-  argAccountsTable: string = accountsTable
+  newDescription: string
 ): Promise<void> => {
-  await db.none(
-    'UPDATE $1:name \
-    SET name=$2, description=$3 \
-    WHERE username=$4 \
-    ', [argAccountsTable, newName, newDescription, username]);
+  const query = new PS({ name: 'update-name-description', text: '\
+    UPDATE accounts SET name=$1, description=$2 WHERE username=$3'
+  });
+
+  query.values = [newName, newDescription, username];
+  await db.none(query);
 };

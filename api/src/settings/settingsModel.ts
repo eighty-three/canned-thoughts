@@ -1,31 +1,37 @@
 import db from '@utils/db';
-const accountsTable = 'accounts';
+import { PreparedStatement as PS } from 'pg-promise';
 
 export const changePassword = async (
   username: string, 
-  hash: string, 
-  argAccountsTable: string = accountsTable
+  hash: string
 ): Promise<void> => {
-  await db.none(
-    'UPDATE $1:name SET password=$2 WHERE username=$3 \
-    ', [argAccountsTable, hash, username]);
+  const query = new PS({ name: 'change-password', text: '\
+    UPDATE accounts SET password=$1 WHERE username=$2'
+  });
+
+  query.values = [hash, username];
+  await db.none(query);
 };
 
 export const changeUsername = async (
   username: string, 
-  newUsername: string, 
-  argAccountsTable: string = accountsTable
+  newUsername: string
 ): Promise<void> => {
-  await db.none(
-    'UPDATE $1:name SET username=$3 WHERE username=$2 \
-    ', [argAccountsTable, username, newUsername]);
+  const query = new PS({ name: 'change-username', text: '\
+    UPDATE accounts SET username=$1 WHERE username=$2'
+  });
+
+  query.values = [newUsername, username];
+  await db.none(query);
 };
 
 export const deleteAccount = async (
-  username: string, 
-  argAccountsTable: string = accountsTable
+  username: string
 ): Promise<void> => {
-  await db.none(
-    'DELETE FROM $1:name WHERE username=$2 \
-    ', [argAccountsTable, username]);
+  const query = new PS({ name: 'delete-account', text: '\
+    DELETE FROM accounts WHERE username=$1'
+  });
+
+  query.values = [username];
+  await db.none(query);
 };

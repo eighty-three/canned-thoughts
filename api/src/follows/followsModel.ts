@@ -1,73 +1,74 @@
 import db from '@utils/db';
-const accountsTable = 'accounts';
-const followsTable = 'follows';
+import { PreparedStatement as PS } from 'pg-promise';
 
 const updateFollowersCount = async (
-  followedUsername: string,
-  argAccountsTable: string = accountsTable, 
-  argFollowsTable: string = followsTable
+  followedUsername: string
 ): Promise<void> => {
-  await db.none( //Separate query with the count function for the number of followers
-    'UPDATE $1:name \
+  const query = new PS({ name: 'update-followers-count', text: '\
+    UPDATE accounts \
 		SET followers= \
-      (SELECT count(*) FROM $2:name \
-      INNER JOIN $1:name ON user_id = user_id_followed WHERE username=$3) \
-		WHERE username=$3 \
-    ', [argAccountsTable, argFollowsTable, followedUsername]
-  );
+      (SELECT count(*) FROM follows \
+      INNER JOIN accounts ON user_id = user_id_followed WHERE username=$1) \
+		WHERE username=$1'
+  });
+
+  // Separate query with the count function for the number of followers
+  query.values = [followedUsername];
+  await db.none(query);
 };
+
 
 export const checkIfFollowed = async (
   followerUsername: string, 
-  followedUsername: string, 
-  argAccountsTable: string = accountsTable, 
-  argFollowsTable: string = followsTable
+  followedUsername: string
 ): Promise<{ user_id_followed: number } | null> => {
-  return await db.oneOrNone( 
-    /*
-     * Returns user_id_followed if 
-     * followerUsername's user_id = user_id_follower AND
-     * followedUsername's user_id = user_id_followed
-     * * */
-    'SELECT user_id_followed from $2:alias f \
-    INNER JOIN $1:alias a1 ON a1.user_id = user_id_follower \
-    INNER JOIN $1:alias a2 ON a2.user_id = user_id_followed \
-    WHERE a1.username=$3 AND a2.username=$4 \
-    ', [argAccountsTable, argFollowsTable, followerUsername, followedUsername]
-  );
+  /* Returns user_id_followed if 
+   * followerUsername's user_id = user_id_follower AND
+   * followedUsername's user_id = user_id_followed
+   * * */
+  const query = new PS({ name: 'check-if-followed', text: '\
+    SELECT user_id_followed from follows f \
+    INNER JOIN accounts a1 ON a1.user_id = user_id_follower \
+    INNER JOIN accounts a2 ON a2.user_id = user_id_followed \
+    WHERE a1.username=$1 AND a2.username=$2'
+  });
+
+  query.values = [followerUsername, followedUsername];
+  return await db.oneOrNone(query);
 };
 
 export const followUser = async (
   followerUsername: string, 
-  followedUsername: string, 
-  argAccountsTable: string = accountsTable, 
-  argFollowsTable: string = followsTable
+  followedUsername: string
 ): Promise<void> => {
-  await db.none(
-    /*
-     * Values are user_id's of given usernames (followedUsername and followedUsername)
-     * Can this be done without creating two additional SELECT subqueries?
-     * * */
-    'INSERT INTO $2:name (user_id_follower, user_id_followed) VALUES \
-      ((SELECT user_id FROM $1:name WHERE username=$3), \
-      (SELECT user_id FROM $1:name WHERE username=$4) ) \
-    ', [argAccountsTable, argFollowsTable, followerUsername, followedUsername]
-  );
+  const query = new PS({ name: 'follow-user', text: '\
+    INSERT INTO follows (user_id_follower, user_id_followed) VALUES \
+      ( (SELECT user_id FROM accounts WHERE username=$1), \
+        (SELECT user_id FROM accounts WHERE username=$2) )'
+  });
 
-  await updateFollowersCount(followedUsername, argAccountsTable, argFollowsTable);
+  /* Values are user_id's of given usernames (followedUsername and followedUsername)
+   * Can this be done without creating two additional SELECT subqueries?
+   * * */
+  query.values = [followerUsername, followedUsername];
+  await db.none(query);
+
+  await updateFollowersCount(followedUsername);
 };
 
 export const unfollowUser = async (
   followerUsername: string, 
-  followedUsername: string, 
-  argAccountsTable: string = accountsTable, 
-  argFollowsTable: string = followsTable
+  followedUsername: string
 ): Promise<void> => {
-  await db.none( //Same as createNewFollow function where two additional SELECT subqueries are made
-    'DELETE FROM $2:name WHERE \
-    user_id_follower=(SELECT user_id FROM $1:name WHERE username=$3) AND \
-    user_id_followed=(SELECT user_id FROM $1:name WHERE username=$4) \
-    ', [argAccountsTable, argFollowsTable, followerUsername, followedUsername]);
+  // Same as followUser function where two additional SELECT subqueries are made
+  const query = new PS({ name: 'unfollow-user', text: '\
+    DELETE FROM follows WHERE \
+    user_id_follower=(SELECT user_id FROM accounts WHERE username=$1) AND \
+    user_id_followed=(SELECT user_id FROM accounts WHERE username=$2)'
+  });
 
-  await updateFollowersCount(followedUsername, argAccountsTable, argFollowsTable);
+  query.values = [followerUsername, followedUsername];
+  await db.none(query);
+
+  await updateFollowersCount(followedUsername);
 };

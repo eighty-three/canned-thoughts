@@ -2,19 +2,17 @@ import * as account from '../account/accountModel';
 import * as settings from '../settings/settingsModel';
 import * as profile from './profileModel';
 
-const testTable = 'accounts_test';
-
 describe('testing functions', () => {
   beforeAll(async () => {
-    await account.createAccount('dummy1', 'pw1', testTable);
+    await account.createAccount('dummy1', 'pw1');
   });
 
   afterAll(async () => {
-    await settings.deleteAccount('dummy1', testTable);
+    await settings.deleteAccount('dummy1');
   });
 
   test('getProfileInfo', async () => {
-    const profileInfo = await profile.getProfileInfo('dummy1', testTable);
+    const profileInfo = await profile.getProfileInfo('dummy1');
 
     expect(profileInfo).toMatchObject({
       name: 'dummy1',
@@ -27,28 +25,28 @@ describe('testing functions', () => {
   });
 
   test('getNameAndDescription', async () => {
-    expect(await profile.getNameAndDescription('dummy1', testTable)).toStrictEqual({
+    expect(await profile.getNameAndDescription('dummy1')).toStrictEqual({
       name: 'dummy1',
       description: null
     });
   });
 
   test('updateNameAndDescription', async () => {
-    expect(await profile.getNameAndDescription('dummy1', testTable)).toStrictEqual({
+    expect(await profile.getNameAndDescription('dummy1')).toStrictEqual({
       name: 'dummy1',
       description: null
     });
 
-    await profile.updateNameAndDescription('dummy1', 'newDummy', 'New Description', testTable);
+    await profile.updateNameAndDescription('dummy1', 'newDummy', 'New Description');
 
-    expect(await profile.getNameAndDescription('dummy1', testTable)).toStrictEqual({
+    expect(await profile.getNameAndDescription('dummy1')).toStrictEqual({
       name: 'newDummy',
       description: 'New Description'
     });
 
-    await profile.updateNameAndDescription('dummy1', 'backToDummy1', 'Old Description', testTable);
+    await profile.updateNameAndDescription('dummy1', 'backToDummy1', 'Old Description');
 
-    expect(await profile.getNameAndDescription('dummy1', testTable)).toStrictEqual({
+    expect(await profile.getNameAndDescription('dummy1')).toStrictEqual({
       name: 'backToDummy1',
       description: 'Old Description'
     });
