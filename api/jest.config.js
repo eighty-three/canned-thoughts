@@ -10,6 +10,7 @@ module.exports = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
+  setupFilesAfterEnv: ['<rootDir>/setupJest.ts'],
   testPathIgnorePatterns: [
     '<rootDir>/src/utils/*.ts',
     '<rootDir>/src/index.ts',
