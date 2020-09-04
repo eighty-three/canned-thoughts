@@ -28,6 +28,7 @@ describe('testing functions', () => {
         followers: 1
       })
     );
+
   });
 
   test('unfollowUser', async () => {
@@ -44,6 +45,18 @@ describe('testing functions', () => {
         followers: 0
       })
     );
+  });
+
+  test('updateFollowersCount', async () => {
+    const spy = jest.spyOn(follows, 'updateFollowersCount');
+
+    await follows.followUser('dummy1', 'dummy2');
+
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    await follows.unfollowUser('dummy1', 'dummy2');
+
+    expect(spy).toHaveBeenCalledTimes(2);
   });
 
   test('checkIfFollowed should fail', async () => {
