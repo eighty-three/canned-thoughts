@@ -79,49 +79,49 @@ export const deletePost = async (
 
 
 // Tags
-// To do: PreparedStatements
-
 export const createTag = async (
-  tag: string,
-  argTagsTable: string = tagsTable
+  tag: string
 ): Promise<number> => {
-  return await db.one(
-    'INSERT INTO $2:name (tag_name) VALUES ($1:name) \
-    ', [tag, argTagsTable]
-  );
+  const query = new PS({ name: 'create-tag', text: '\
+    INSERT INTO tags (tag_name) VALUES ($1) RETURNING tag_id'
+  });
+
+  query.values = [tag];
+  return await db.one(query);
 };
 
 export const checkTag = async (
-  tag: string,
-  argTagsTable: string = tagsTable
+  tag: string
 ): Promise<number | null> => {
-  return await db.one(
-    'SELECT tag_id FROM $2:name WHERE tag_name=$1:name \
-    ', [tag, argTagsTable]
-  );
+  const query = new PS({ name: 'check-tag', text: '\
+    SELECT tag_id FROM tags WHERE tag_name=$1'
+  });
+
+  query.values = [tag];
+  return await db.oneOrNone(query);
 };
 
 export const deleteTag = async (
-  tag: string,
-  argTagsTable: string = tagsTable
+  tag: string
 ): Promise<void> => {
-  await db.none(
-    'DELETE FROM $2:name WHERE tag_name=$1:name \
-    ', [tag, argTagsTable]
-  );
+  const query = new PS({ name: 'delete-tag', text: '\
+    DELETE FROM tags WHERE tag_name=$1'
+  });
+
+  query.values = [tag];
+  await db.none(query);
 };
 
 export const createPostTagRelation = async (
   post_id:number,
-  tag_id: number,
-  argPostsTagsTable: string = postsTagsTable
+  tag_id: number
 ): Promise<void> => {
-  const input = [post_id, tag_id];
+  const query = new PS({ name: 'create-post-tag-relation', text: '\
+    INSERT INTO posts_tags (post_id, tag_id) VALUES ($1, $2)'
+  });
 
-  await db.none(
-    'INSERT INTO $2:name (post_id, tag_id) VALUES ($1:csv) \
-    ', [input, argPostsTagsTable]
-  );
+  query.values = [post_id, tag_id];
+  await db.none(query);
 };
 
 interface IOptions {
