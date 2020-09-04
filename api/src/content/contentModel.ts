@@ -1,4 +1,5 @@
 import db from '@utils/db';
+import { PreparedStatement as PS } from 'pg-promise';
 
 const accountsTable = 'accounts';
 const postsTable = 'posts';
@@ -9,69 +10,76 @@ interface IPost {
   post: string;
   url: string;
   date: number;
-  tags: string[];
+  tags: string;
 }
 
 export const createPost = async (
   username: string,
   post: string,
   url: string,
-  tags: string[],
-  argAccountsTable: string = accountsTable,
-  argPostsTable: string = postsTable
+  tags?: string[]
 ): Promise<number> => {
   /* From [ 'tag1', 'tag2', 'tag3' ] as an array
-   * to { 'tag1', 'tag2', 'tag3' } as a string
-   * because of Postgres' formatting for array types.
-   * Maybe I should do away with Postgres' array types
-   * since I only need this column as a string;
-   * I won't be doing any sort of complex queries on it
+   * to 'tag1|tag2|tag3' as a string
+   * since the | character won't be allowed in the form
+   * so when getting the post data, I can easily transform it
+   * with a split call using the | character
    */
-  const fixedTags = `{ '${tags.join('\', \'')}' }`;
-  const input = [post, url, fixedTags];
+  const fixedTags = (tags)
+    ? `${tags.join('|')}`
+    : null;
 
-  return await db.one(
-    'INSERT INTO $3:name (user_id, post, url, tags) \
-    VALUES ((SELECT user_id FROM $3:name WHERE username=$2:name), $1:csv) \
-    RETURNING post_id', [input, username, argAccountsTable, argPostsTable]
-  );
-};
+  const query = new PS({ name: 'create-post', text: '\
+    INSERT INTO posts (user_id, post, url, tags) \
+    VALUES ((SELECT user_id FROM accounts WHERE username=$1), $2, $3, $4) \
+    RETURNING post_id',
+  });
 
-export const deletePost = async (
-  url: string,
-  argPostsTable: string = postsTable
-): Promise<void> => {
-  await db.none(
-    'DELETE FROM $2:name WHERE url=$1:name \
-    ', [url, argPostsTable]
-  );
+  query.values = [username, post, url, fixedTags];
+  return await db.one(query);
 };
 
 export const getPost = async (
-  url: string,
-  argPostsTable: string = postsTable,
+  url: string
 ): Promise<IPost> => {
-  return await db.one(
-    'SELECT post, url, date, tags FROM $2:name WHERE url=$1:name \
-    ', [url, argPostsTable ]
-  );
+  const query = new PS({ name: 'get-post', text: '\
+    SELECT post, url, date, tags FROM posts WHERE url=$1'
+  });
+
+  query.values = [url];
+  return await db.one(query);
 };
 
 export const getPosts = async (
   username: string,
-  offset: number,
-  argAccountsTable: string = accountsTable,
-  argPostsTable: string = postsTable
+  offset: number
 ): Promise<IPost[] | null> => {
-  return await db.manyOrNone(
-    // Returns posts in the range `offset` to `offset + 10` by account `username`
-    'SELECT post, url, date, tags FROM $4:name p \
-    INNER JOIN $3:name a ON a.user_id = p.user_id \
-    WHERE a.username=$1:name \
-    ORDER BY "TimeStamp" asc LIMIT 10 OFFSET $2:alias \
-    ', [username, offset, argAccountsTable, argPostsTable ]
-  );
+  // Returns posts in the range `offset` to `offset + 10` by account `username`
+  const query = new PS({ name: 'get-posts', text: '\
+    SELECT post, url, p.date, tags FROM posts p \
+    INNER JOIN accounts a ON a.user_id = p.user_id \
+    WHERE a.username=$1 \
+    ORDER BY p.date asc LIMIT 10 OFFSET $2'
+  });
+
+  query.values = [username, offset];
+  return await db.manyOrNone(query);
 };
+
+export const deletePost = async (
+  url: string
+): Promise<void> => {
+  const query = new PS({ name: 'delete-post', text: '\
+    DELETE FROM posts WHERE url=$1'
+  });
+
+  query.values = [url];
+  await db.none(query);
+};
+
+
+// Tags
+// To do: PreparedStatements
 
 export const createTag = async (
   tag: string,
