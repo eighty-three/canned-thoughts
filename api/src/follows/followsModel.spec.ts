@@ -50,7 +50,7 @@ describe('testing functions', () => {
     expect(await follows.checkIfFollowed('dummy1', 'dummy2')).toStrictEqual(null);
   });
 
-  test('checkIfFOllowed should work', async () => {
+  test('checkIfFollowed should work', async () => {
     expect(await follows.checkIfFollowed('dummy1', 'dummy2')).toStrictEqual(null);
 
     await follows.followUser('dummy1', 'dummy2');
