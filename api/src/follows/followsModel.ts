@@ -1,7 +1,7 @@
 import db from '@utils/db';
 import { PreparedStatement as PS } from 'pg-promise';
 
-const updateFollowersCount = async (
+export const updateFollowersCount = async (
   followedUsername: string
 ): Promise<void> => {
   const query = new PS({ name: 'update-followers-count', text: '\
