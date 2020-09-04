@@ -14,11 +14,16 @@ describe('testing functions', () => {
   });
 
   test('getProfileInfo', async () => {
-    expect(await profile.getProfileInfo('dummy1', testTable)).toStrictEqual({
+    const profileInfo = await profile.getProfileInfo('dummy1', testTable);
+
+    expect(profileInfo).toMatchObject({
       name: 'dummy1',
       description: null,
       followers: 0
     });
+
+    expect(profileInfo.date).toBeTruthy();
+    expect(profileInfo.date).not.toBeFalsy();
   });
 
   test('getNameAndDescription', async () => {
