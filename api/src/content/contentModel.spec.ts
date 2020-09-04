@@ -68,3 +68,43 @@ describe('testing posts', () => {
     expect(await content.getPosts('dummy', 0)).toHaveLength(1);
   });
 });
+
+describe('testing tags', () => {
+  beforeEach(async () => {
+    await content.deleteTag('test_tag');
+  });
+
+  test('createTag', async () => {
+    expect(await content.checkTag('test_tag')).toStrictEqual(null);
+
+    expect(await content.createTag('test_tag')).toStrictEqual({ tag_id: 1 });
+
+    expect(await content.checkTag('test_tag')).toStrictEqual({ tag_id: 1 });
+  });
+
+  test('checkTag', async () => {
+    expect(await content.checkTag('test_tag')).toStrictEqual(null);
+
+    expect(await content.createTag('test_tag')).toStrictEqual({ tag_id: 2 }); // Because of the serial
+
+    expect(await content.checkTag('diff_tag')).toStrictEqual(null);
+    expect(await content.checkTag('test_tag')).toStrictEqual({ tag_id: 2 });
+  });
+
+  test('deleteTag', async () => {
+    expect(await content.checkTag('test_tag')).toStrictEqual(null);
+
+    expect(await content.createTag('test_tag')).toStrictEqual({ tag_id: 3 });
+
+    expect(await content.checkTag('diff_tag')).toStrictEqual(null);
+    expect(await content.checkTag('test_tag')).toStrictEqual({ tag_id: 3 });
+
+    await content.deleteTag('test_tag');
+
+    expect(await content.checkTag('test_tag')).toStrictEqual(null);
+  });
+
+  test('createPostTagRelation', async () => {
+    //await content.createPostTagRelation(1, 1);
+  });
+});
