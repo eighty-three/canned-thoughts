@@ -8,22 +8,40 @@ const tables = [
   'accounts'
 ];
 
-const serials = [
+const seqs = [
   { table: 'accounts', serialColumn: 'user_id' },
   { table: 'posts', serialColumn: 'post_id' },
   { table: 'tags', serialColumn: 'tag_id' },
 ];
 
 export const resetData = async (): Promise<void> => {
-  tables.forEach(async (table) => {
-    await db.none('DELETE FROM $1:name', [table]);
-  });
+  try {
+    await db.tx(t => {
+      const mappedTables = tables.map((table) => {
+        t.none('DELETE FROM $1:name', [table]);
+      });
+
+      return t.batch(mappedTables);
+    });
+  } catch (err) {
+    console.log(err);
+    console.log('Testing too fast');
+  };
 };
 
 export const resetSequence = async (): Promise<void> => {
   // await db.none('ALTER SEQUENCE <tablename>_<id>_seq RESTART;');
-  serials.forEach(async (obj) => {
-    const input = `${obj.table}_${obj.serialColumn}_seq`;
-    await db.none('ALTER SEQUENCE $1:name RESTART', [input]);
-  });
+  try {
+    await db.tx(t => {
+      const mappedSeqs = seqs.map((obj) => {
+        const input = `${obj.table}_${obj.serialColumn}_seq`;
+        t.none('ALTER SEQUENCE $1:name RESTART', [input]);
+      });
+
+      return t.batch(mappedSeqs);
+    });
+  } catch (err) {
+    console.log(err);
+    console.log('Testing too fast');
+  };
 };
