@@ -3,7 +3,6 @@ import { PreparedStatement as PS } from 'pg-promise';
 
 const accountsTable = 'accounts';
 const postsTable = 'posts';
-const tagsTable = 'tags';
 const postsTagsTable = 'posts_tags';
 
 interface IPost {
@@ -11,6 +10,10 @@ interface IPost {
   url: string;
   date: number;
   tags: string;
+}
+
+interface IError {
+  error: string;
 }
 
 export const createPost = async (
@@ -81,24 +84,18 @@ export const deletePost = async (
 // Tags
 export const createTag = async (
   tag: string
-): Promise<number> => {
+): Promise<number|IError> => {
   const query = new PS({ name: 'create-tag', text: '\
     INSERT INTO tags (tag_name) VALUES ($1) RETURNING tag_id'
   });
 
   query.values = [tag];
-  return await db.one(query);
-};
-
-export const checkTag = async (
-  tag: string
-): Promise<number | null> => {
-  const query = new PS({ name: 'check-tag', text: '\
-    SELECT tag_id FROM tags WHERE tag_name=$1'
-  });
-
-  query.values = [tag];
-  return await db.oneOrNone(query);
+  //return await db.one(query);
+  try {
+    return await db.one(query);
+  } catch {
+    return {error: 'Tag exists'};
+  }
 };
 
 export const deleteTag = async (
@@ -138,8 +135,10 @@ export const searchPostsWithTag = async (
   argPostsTable: string = postsTable,
   argPostsTagsTable: string = postsTagsTable
 ): Promise<IPost[] | null> => {
-  /* Inclusive means it returns posts with tags 'x', or 'y', or 'x' and 'y'
-   * Exclusive means it returns posts with tags 'x' and 'y' only
+  /* Inclusive means it returns posts with tags: 
+   *    'x', or 'y', or 'x' and 'y'
+   * Exclusive means it returns posts with tags: 
+   *    'x' only, or 'y' only, or 'x' and 'y' only
    */
   if (options.scope === 'inclusive') {
     if (options.followedOnly) {
