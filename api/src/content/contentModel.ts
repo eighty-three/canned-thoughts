@@ -9,22 +9,6 @@ export const createPost = async (
   tags?: string[]
 ): Promise<void> => {
   if (tags) {
-    /* From [ 'tag1', 'tag2', 'tag3' ] as an array
-     * to 'tag1|tag2|tag3' as a string
-     * since the | character won't be allowed in the form
-     * so when getting the post data, I can easily transform it
-     * with a split call using the | character
-     */
-    const fixedTags = `${tags.join('|')}`;
-    const createPost = new PS({ name: 'create-post-with-tags', text: '\
-      INSERT INTO posts (user_id, post, url, tags) \
-      VALUES ((SELECT user_id FROM accounts WHERE username=$1), $2, $3, $4) \
-      RETURNING post_id',
-    });
-    
-    createPost.values = [username, post, url, fixedTags];
-    const createPostOutput = await db.one(createPost);
-    
     const tag_ids = await db.tx(t => {
       const tagQueries = tags.map((tag) => {
         const tagQuery = new PS({ name: 'create-tag', text: '\
@@ -48,16 +32,30 @@ export const createPost = async (
     
       return t.batch(tagQueries);
     });
-    
-    await db.tx(t => {
-      const queries = tag_ids.map((tag) => {
-        t.none(
-          'INSERT INTO posts_tags (post_id, tag_id) \
-          VALUES ($1, $2)', [createPostOutput.post_id, tag.tag_id]);
-      });
-    
-      return t.batch(queries);
+
+    const mappedTags = tag_ids.map((tag) => Number(tag.tag_id));
+
+    /* From [ 'tag1', 'tag2', 'tag3' ] as an array
+     * to 'tag1|tag2|tag3' as a string
+     * since the | character won't be allowed in the form
+     * so when getting the post data, I can easily transform it
+     * with a split call using the | character
+     */
+    const fixedTags = `${tags.join('|')}`;
+    const createPost = new PS({ name: 'create-post-with-tags', text: '\
+      INSERT INTO posts (user_id, post, url, tags) \
+      VALUES ((SELECT user_id FROM accounts WHERE username=$1), $2, $3, $4) \
+      RETURNING post_id',
     });
+    createPost.values = [username, post, url, fixedTags];
+
+    await db.task(async t => {
+      const postRow = await t.one(createPost);
+      await t.none(
+        'INSERT INTO posts_tags (post_id, tag_id) \
+        VALUES ($1, $2)', [postRow.post_id, mappedTags]);
+    });
+
   } else { // If no tags
     const query = new PS({ name: 'create-post-no-tags', text: '\
       INSERT INTO posts (user_id, post, url) \
@@ -190,3 +188,47 @@ export const searchPostsWithTags = async (
     }
   }
 };
+
+    //const fixedTags = `${tags.join('|')}`;
+    //const createPost = new PS({ name: 'create-post-with-tags', text: '\
+      //INSERT INTO posts (user_id, post, url, tags) \
+      //VALUES ((SELECT user_id FROM accounts WHERE username=$1), $2, $3, $4) \
+      //RETURNING post_id',
+    //});
+    
+    //createPost.values = [username, post, url, fixedTags];
+    //const createPostOutput = await db.one(createPost);
+    
+    //const tag_ids = await db.tx(t => {
+      //const tagQueries = tags.map((tag) => {
+        //const tagQuery = new PS({ name: 'create-tag', text: '\
+          //WITH ins AS (\
+            //INSERT INTO tags (tag_name)\
+            //VALUES ($1)\
+            //ON     CONFLICT (tag_name) DO UPDATE\
+            //SET    tag_name = NULL \
+            //WHERE  FALSE\
+            //RETURNING tag_id\
+            //)\
+          //SELECT tag_id FROM ins\
+            //UNION  ALL\
+            //SELECT tag_id FROM tags\
+            //WHERE  tag_name = $1'
+        //});
+    
+        //tagQuery.values = [tag];
+        //return t.one(tagQuery);
+      //});
+    
+      //return t.batch(tagQueries);
+    //});
+    
+    //await db.tx(t => {
+      //const queries = tag_ids.map((tag) => {
+        //t.none(
+          //'INSERT INTO posts_tags (post_id, tag_id) \
+          //VALUES ($1, $2)', [createPostOutput.post_id, tag.tag_id]);
+      //});
+    
+      //return t.batch(queries);
+    //});

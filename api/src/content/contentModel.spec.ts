@@ -10,7 +10,7 @@ describe('testing posts', () => {
     const tags = ['tag1', 'tag2', 'tag3'];
     await content.createPost('dummy', 'post', 'url1', tags);
 
-    expect(await content.checkPostsTagsTable()).toHaveLength(3);
+    expect(await content.checkPostsTagsTable()).toHaveLength(1);
   });
 
   test('createPost with no tags', async () => {
@@ -18,7 +18,7 @@ describe('testing posts', () => {
 
     await content.createPost('dummy', 'post', 'url2');
 
-    expect(await content.checkPostsTagsTable()).toHaveLength(3);
+    expect(await content.checkPostsTagsTable()).toHaveLength(1);
 
     expect(await content.getPosts('dummy', 0)).toHaveLength(2);
   });
