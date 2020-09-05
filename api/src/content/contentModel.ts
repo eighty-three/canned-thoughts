@@ -156,32 +156,30 @@ export const searchPostsWithTags = async (
   options: IOptions,
   offset: number
 ): Promise<IPost[] | null> => {
+  const tagQuery = new PS({ name: 'find-tag-id', text: '\
+    SELECT tag_id FROM tags WHERE tag_name=$1'
+  });
+
+  const tag_ids = await db.tx(t => {
+    return t.batch(tags.map((tag) => {
+      tagQuery.values = [tag];
+      return t.one(tagQuery);
+    }));
+  });
+
+  const fixedIds = tag_ids.map((tag) => tag.tag_id);
+
   /* Inclusive means it returns posts with tags: 
    *    'x', or 'y', or 'x' and 'y'
    * Exclusive means it returns posts with tags: 
    *    'x' only, or 'y' only, or 'x' and 'y' only
    * Followed means it returns posts from people you follow
-   */
-  const tagQuery = new PS({ name: 'find-tag-id', text: '\
-    SELECT tag_id FROM tags WHERE tag_name=$1'
-  });
-
+   * * * * * * * * * * * * * * * * * * * * * * * * * * * */
   if (options.scope === 'inclusive') {
   /* ==============================INCLUSIVE ============================== */
 
     if (options.followedOnly) {
       /* ============ FOLLOWED ============ */
-      const tag_ids = await db.tx(t => {
-        const tagQueries = tags.map((tag) => {
-          tagQuery.values = [tag];
-          return t.one(tagQuery);
-        });
-      
-        return t.batch(tagQueries);
-      });
-
-      const fixedIds = tag_ids.map((tag) => tag.tag_id);
-
       const query = new PS({ name: 'search-inclusive-followed', text: '\
         SELECT post, url, p.date, tags FROM posts p \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
@@ -196,17 +194,6 @@ export const searchPostsWithTags = async (
 
     } else {
       /* ============ ALL ============ */
-      const tag_ids = await db.tx(t => {
-        const tagQueries = tags.map((tag) => {
-          tagQuery.values = [tag];
-          return t.one(tagQuery);
-        });
-      
-        return t.batch(tagQueries);
-      });
-
-      const fixedIds = tag_ids.map((tag) => tag.tag_id);
-
       const query = new PS({ name: 'search-inclusive-all', text: '\
         SELECT post, url, p.date, tags FROM posts p \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
@@ -224,17 +211,6 @@ export const searchPostsWithTags = async (
 
     if (options.followedOnly) {
       /* ============ FOLLOWED ============ */
-      const tag_ids = await db.tx(t => {
-        const tagQueries = tags.map((tag) => {
-          tagQuery.values = [tag];
-          return t.one(tagQuery);
-        });
-      
-        return t.batch(tagQueries);
-      });
-
-      const fixedIds = tag_ids.map((tag) => tag.tag_id);
-
       const query = new PS({ name: 'search-exclusive-followed', text: '\
         SELECT post, url, p.date, tags FROM posts p \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
@@ -249,17 +225,6 @@ export const searchPostsWithTags = async (
 
     } else {
       /* ============ ALL ============ */
-      const tag_ids = await db.tx(t => {
-        const tagQueries = tags.map((tag) => {
-          tagQuery.values = [tag];
-          return t.one(tagQuery);
-        });
-      
-        return t.batch(tagQueries);
-      });
-
-      const fixedIds = tag_ids.map((tag) => tag.tag_id);
-
       const query = new PS({ name: 'search-exclusive-all', text: '\
         SELECT post, url, p.date, tags FROM posts p \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
