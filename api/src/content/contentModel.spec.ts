@@ -74,23 +74,22 @@ describe('testing tags', () => {
     await content.deleteTag('test_tag');
   });
 
-  test('createTag', async () => {
-    expect(await content.createTag('test_tag')).toStrictEqual({ tag_id: 1 });
+  test('getTag', async () => {
+    expect(await content.getTag('test_tag')).toStrictEqual({ tag_id: 1 });
+    expect(await content.getTag('test_tag')).toStrictEqual({ tag_id: 1 });
 
-    expect(await content.createTag('test_tag')).toStrictEqual({error: 'Tag exists'});
+    /* Weird that even if there's an error, the serial count still increases,
+     * apparently it adds to the serial count first before checking for conflicts,
+     * hence tag_id: 3 (and 4 and 5 below)
+     */
+    expect(await content.getTag('test_tag2')).toStrictEqual({ tag_id: 3 });
   });
 
   test('deleteTag', async () => {
-    expect(await content.createTag('test_tag')).toStrictEqual({ tag_id: 3 });
-    /* Weird that even if there's an error, the serial count still increases,
-     * hence tag_id: 3 (and tag_id: 5 below)
-     */
-
-    expect(await content.createTag('test_tag')).toStrictEqual({error: 'Tag exists'});
-
+    expect(await content.getTag('test_tag')).toStrictEqual({ tag_id: 4 });
     await content.deleteTag('test_tag');
 
-    expect(await content.createTag('test_tag')).toStrictEqual({ tag_id: 5 });
+    expect(await content.getTag('test_tag')).toStrictEqual({ tag_id: 5 });
   });
 
   test('createPostTagRelation', async () => {

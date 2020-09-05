@@ -12,10 +12,6 @@ interface IPost {
   tags: string;
 }
 
-interface IError {
-  error: string;
-}
-
 export const createPost = async (
   username: string,
   post: string,
@@ -82,20 +78,28 @@ export const deletePost = async (
 
 
 // Tags
-export const createTag = async (
+export const getTag = async (
   tag: string
-): Promise<number|IError> => {
-  const query = new PS({ name: 'create-tag', text: '\
-    INSERT INTO tags (tag_name) VALUES ($1) RETURNING tag_id'
+): Promise<number> => {
+  // https://stackoverflow.com/a/40325406/435563
+  // tl;dr: inefficiencies and race conditions
+  const query = new PS({ name: 'get-tag', text: '\
+    WITH ins AS (\
+      INSERT INTO tags (tag_name)\
+      VALUES ($1)\
+      ON     CONFLICT (tag_name) DO UPDATE\
+      SET    tag_name = NULL \
+      WHERE  FALSE\
+      RETURNING tag_id\
+      )\
+    SELECT tag_id FROM ins\
+    UNION  ALL\
+    SELECT tag_id FROM tags\
+    WHERE  tag_name = $1'
   });
 
   query.values = [tag];
-  //return await db.one(query);
-  try {
-    return await db.one(query);
-  } catch {
-    return {error: 'Tag exists'};
-  }
+  return await db.one(query);
 };
 
 export const deleteTag = async (
