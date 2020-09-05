@@ -2,10 +2,6 @@ import db from '@utils/db';
 import { PreparedStatement as PS } from 'pg-promise';
 import { IPost, IRelation, IOptions } from './content.types';
 
-const accountsTable = 'accounts';
-const postsTable = 'posts';
-const postsTagsTable = 'posts_tags';
-
 export const createPost = async (
   username: string,
   post: string,
@@ -148,44 +144,49 @@ export const deleteTag = async (
   await db.none(query);
 };
 
-
 export const checkPostsTagsTable = async (): Promise<IRelation[] | null> => {
   return await db.manyOrNone('SELECT * FROM posts_tags');
 };
 
-// To do
-export const searchPostsWithTag = async (
+export const searchPostsWithTags = async (
   username: string,
   tags: string[],
   options: IOptions,
-  argAccountsTable: string = accountsTable,
-  argPostsTable: string = postsTable,
-  argPostsTagsTable: string = postsTagsTable
+  offset: number
 ): Promise<IPost[] | null> => {
   /* Inclusive means it returns posts with tags: 
    *    'x', or 'y', or 'x' and 'y'
    * Exclusive means it returns posts with tags: 
    *    'x' only, or 'y' only, or 'x' and 'y' only
+   * Followed means it returns posts from people you follow
    */
   if (options.scope === 'inclusive') {
     if (options.followedOnly) {
-      return await db.manyOrNone(
-        'SELECT * from $1:name', [argAccountsTable]
-      );
-    } else {
-      return await db.manyOrNone(
-        'SELECT * from $1:name', [argAccountsTable]
-      );
+      const query = new PS({ name: 'search-inclusive-followed', text: '\
+        SELECT * from posts', values: [username, tags, offset]
+      });
+
+      return await db.manyOrNone(query);
+    } else { // All posts instead of from followed only
+      const query = new PS({ name: 'search-inclusive-all', text: '\
+        SELECT * from posts', values: [username, tags, offset]
+      });
+
+      return await db.manyOrNone(query);
     }
   } else { // options.scope === 'exclusive'
     if (options.followedOnly) {
-      return await db.manyOrNone(
-        'SELECT * from $1:name', [argAccountsTable]
-      );
-    } else {
-      return await db.manyOrNone(
-        'SELECT * from $1:name', [argAccountsTable]
-      );
+      const query = new PS({ name: 'search-exclusive-followed', text: '\
+        SELECT * from posts', values: [username, tags, offset]
+      });
+
+      return await db.manyOrNone(query);
+    } else { // All posts instead of from followed only
+      const query = new PS({ name: 'search-exclusive-all', text: '\
+        SELECT * from posts', values: [username, tags, offset]
+      });
+
+      return await db.manyOrNone(query);
     }
   }
 };
