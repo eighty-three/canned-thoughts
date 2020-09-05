@@ -162,30 +162,110 @@ export const searchPostsWithTags = async (
    *    'x' only, or 'y' only, or 'x' and 'y' only
    * Followed means it returns posts from people you follow
    */
+  const tagQuery = new PS({ name: 'find-tag-id', text: '\
+    SELECT tag_id FROM tags WHERE tag_name=$1'
+  });
+
   if (options.scope === 'inclusive') {
+  /* ==============================INCLUSIVE ============================== */
+
     if (options.followedOnly) {
+      /* ============ FOLLOWED ============ */
+      const tag_ids = await db.tx(t => {
+        const tagQueries = tags.map((tag) => {
+          tagQuery.values = [tag];
+          return t.one(tagQuery);
+        });
+      
+        return t.batch(tagQueries);
+      });
+
+      const fixedIds = tag_ids.map((tag) => tag.tag_id);
+
       const query = new PS({ name: 'search-inclusive-followed', text: '\
-        SELECT * from posts', values: [username, tags, offset]
+        SELECT post, url, p.date, tags FROM posts p \
+        INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
+        INNER JOIN follows f ON f.user_id_followed = p.user_id \
+        INNER JOIN accounts a ON a.user_id = f.user_id_followed \
+        WHERE pt.tag_id && $2 AND a.username = $1\
+        ORDER BY p.date asc LIMIT 10 OFFSET $3 \
+        ', values: [username, fixedIds, offset]
       });
 
       return await db.manyOrNone(query);
-    } else { // All posts instead of from followed only
+
+    } else {
+      /* ============ ALL ============ */
+      const tag_ids = await db.tx(t => {
+        const tagQueries = tags.map((tag) => {
+          tagQuery.values = [tag];
+          return t.one(tagQuery);
+        });
+      
+        return t.batch(tagQueries);
+      });
+
+      const fixedIds = tag_ids.map((tag) => tag.tag_id);
+
       const query = new PS({ name: 'search-inclusive-all', text: '\
-        SELECT * from posts', values: [username, tags, offset]
+        SELECT post, url, p.date, tags FROM posts p \
+        INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
+        WHERE pt.tag_id && $1 \
+        ORDER BY p.date asc LIMIT 10 OFFSET $2 \
+        ', values: [fixedIds, offset]
       });
 
       return await db.manyOrNone(query);
     }
-  } else { // options.scope === 'exclusive'
+
+  
+  } else {
+  /* ============================== EXCLUSIVE ============================== */
+
     if (options.followedOnly) {
+      /* ============ FOLLOWED ============ */
+      const tag_ids = await db.tx(t => {
+        const tagQueries = tags.map((tag) => {
+          tagQuery.values = [tag];
+          return t.one(tagQuery);
+        });
+      
+        return t.batch(tagQueries);
+      });
+
+      const fixedIds = tag_ids.map((tag) => tag.tag_id);
+
       const query = new PS({ name: 'search-exclusive-followed', text: '\
-        SELECT * from posts', values: [username, tags, offset]
+        SELECT post, url, p.date, tags FROM posts p \
+        INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
+        INNER JOIN follows f ON f.user_id_followed = p.user_id \
+        INNER JOIN accounts a ON a.user_id = f.user_id_followed \
+        WHERE pt.tag_id = $2 AND a.username = $1\
+        ORDER BY p.date asc LIMIT 10 OFFSET $3 \
+        ', values: [username, fixedIds, offset]
       });
 
       return await db.manyOrNone(query);
-    } else { // All posts instead of from followed only
+
+    } else {
+      /* ============ ALL ============ */
+      const tag_ids = await db.tx(t => {
+        const tagQueries = tags.map((tag) => {
+          tagQuery.values = [tag];
+          return t.one(tagQuery);
+        });
+      
+        return t.batch(tagQueries);
+      });
+
+      const fixedIds = tag_ids.map((tag) => tag.tag_id);
+
       const query = new PS({ name: 'search-exclusive-all', text: '\
-        SELECT * from posts', values: [username, tags, offset]
+        SELECT post, url, p.date, tags FROM posts p \
+        INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
+        WHERE pt.tag_id = $1 \
+        ORDER BY p.date asc LIMIT 10 OFFSET $2 \
+        ', values: [fixedIds, offset]
       });
 
       return await db.manyOrNone(query);
