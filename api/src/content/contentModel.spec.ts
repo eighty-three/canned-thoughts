@@ -7,19 +7,23 @@ beforeAll(async () => {
 
 describe('testing posts', () => {
   test('createPost with tags', async () => {
-    const tags = ['1', '2', '3'];
-    expect(await content.createPost('dummy', 'post', 'url1', tags)).toStrictEqual({post_id: 1});
+    const tags = ['tag1', 'tag2', 'tag3'];
+    await content.createPost('dummy', 'post', 'url1', tags);
+
+    expect(await content.checkPostsTagsTable()).toHaveLength(3);
   });
 
   test('createPost with no tags', async () => {
-    expect(await content.createPost('dummy', 'post', 'url2')).toStrictEqual({post_id: 2});
+    await content.createPost('dummy', 'post', 'url2');
+
+    expect(await content.checkPostsTagsTable()).toHaveLength(3);
   });
 
   test('getPost with tags', async () => {
     expect(await content.getPost('url1')).toMatchObject({
       post: 'post',
       url: 'url1',
-      tags: '1|2|3'
+      tags: 'tag1|tag2|tag3'
     });
   });
 
@@ -42,16 +46,16 @@ describe('testing posts', () => {
     expect(await content.getPosts('dummy', 1)).toEqual(expect.arrayContaining([
       expect.objectContaining({
         post: 'post',
-        tags: null,
-        url: 'url3'
+        url: 'url3',
+        tags: null
       })
     ]));
 
     expect(await content.getPosts('dummy', 1)).not.toEqual(expect.arrayContaining([
       expect.objectContaining({
         post: 'post',
-        tags: '1|2|3',
-        url: 'url1'
+        url: 'url1',
+        tags: 'tag1|tag2|tag3'
       })
     ]));
   });
@@ -75,21 +79,24 @@ describe('testing tags', () => {
   });
 
   test('getTag', async () => {
-    expect(await content.getTag('test_tag')).toStrictEqual({ tag_id: 1 });
-    expect(await content.getTag('test_tag')).toStrictEqual({ tag_id: 1 });
-
     /* Weird that even if there's an error, the serial count still increases,
      * apparently it adds to the serial count first before checking for conflicts,
-     * hence tag_id: 3 (and 4 and 5 below)
+     * hence tag_id: 4 (and 5, 7, and 8 below)
      */
-    expect(await content.getTag('test_tag2')).toStrictEqual({ tag_id: 3 });
+    expect(await content.getTag('test_tag')).toStrictEqual({ tag_id: 4 });
+
+    expect(await content.getTag('test_tag2')).toStrictEqual({ tag_id: 5 });
+
+    expect(await content.getTag('test_tag')).toStrictEqual({ tag_id: 4 }); 
+    // Adds another count even if no new row is created
   });
 
   test('deleteTag', async () => {
-    expect(await content.getTag('test_tag')).toStrictEqual({ tag_id: 4 });
+    expect(await content.getTag('test_tag')).toStrictEqual({ tag_id: 7 });
+
     await content.deleteTag('test_tag');
 
-    expect(await content.getTag('test_tag')).toStrictEqual({ tag_id: 5 });
+    expect(await content.getTag('test_tag')).toStrictEqual({ tag_id: 8 });
   });
 
   test('createPostTagRelation', async () => {
