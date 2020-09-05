@@ -9,6 +9,10 @@ export const createPost = async (
   tags?: string[]
 ): Promise<void> => {
   if (tags) {
+    /* If the tag is not in the database,
+     * create tag, returning tag_id. Else,
+     * return its tag_id.
+     */
     const tag_ids = await db.tx(t => {
       const tagQueries = tags.map((tag) => {
         const tagQuery = new PS({ name: 'create-tag', text: '\
