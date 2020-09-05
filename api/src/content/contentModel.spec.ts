@@ -75,33 +75,22 @@ describe('testing tags', () => {
   });
 
   test('createTag', async () => {
-    expect(await content.checkTag('test_tag')).toStrictEqual(null);
-
     expect(await content.createTag('test_tag')).toStrictEqual({ tag_id: 1 });
 
-    expect(await content.checkTag('test_tag')).toStrictEqual({ tag_id: 1 });
-  });
-
-  test('checkTag', async () => {
-    expect(await content.checkTag('test_tag')).toStrictEqual(null);
-
-    expect(await content.createTag('test_tag')).toStrictEqual({ tag_id: 2 }); // Because of the serial
-
-    expect(await content.checkTag('diff_tag')).toStrictEqual(null);
-    expect(await content.checkTag('test_tag')).toStrictEqual({ tag_id: 2 });
+    expect(await content.createTag('test_tag')).toStrictEqual({error: 'Tag exists'});
   });
 
   test('deleteTag', async () => {
-    expect(await content.checkTag('test_tag')).toStrictEqual(null);
-
     expect(await content.createTag('test_tag')).toStrictEqual({ tag_id: 3 });
+    /* Weird that even if there's an error, the serial count still increases,
+     * hence tag_id: 3 (and tag_id: 5 below)
+     */
 
-    expect(await content.checkTag('diff_tag')).toStrictEqual(null);
-    expect(await content.checkTag('test_tag')).toStrictEqual({ tag_id: 3 });
+    expect(await content.createTag('test_tag')).toStrictEqual({error: 'Tag exists'});
 
     await content.deleteTag('test_tag');
 
-    expect(await content.checkTag('test_tag')).toStrictEqual(null);
+    expect(await content.createTag('test_tag')).toStrictEqual({ tag_id: 5 });
   });
 
   test('createPostTagRelation', async () => {
