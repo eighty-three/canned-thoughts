@@ -14,9 +14,13 @@ describe('testing posts', () => {
   });
 
   test('createPost with no tags', async () => {
+    expect(await content.getPosts('dummy', 0)).toHaveLength(1);
+
     await content.createPost('dummy', 'post', 'url2');
 
     expect(await content.checkPostsTagsTable()).toHaveLength(3);
+
+    expect(await content.getPosts('dummy', 0)).toHaveLength(2);
   });
 
   test('getPost with tags', async () => {
