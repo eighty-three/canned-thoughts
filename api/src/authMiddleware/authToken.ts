@@ -5,14 +5,14 @@ import cookie from 'cookie';
 
 export const verifyToken: RequestHandler = async (req, res, next) => {
   if (!req.headers.cookie) {
-    res.json({ error: 'You are not authenticated' });
+    res.status(401).json({ error: 'You are not authenticated' });
     return;
   }
 
   const cookies = cookie.parse(req.headers.cookie);
   verify(cookies.auth, config.SECRET_JWT, async function (err, decoded) {
     if (err && !decoded) {
-      res.json({ error: 'You are not authenticated' });
+      res.status(401).json({ error: 'You are not authenticated' });
       return;
     }
   });
@@ -33,5 +33,6 @@ export const verifyExistingToken: RequestHandler = async (req, res, next) => {
       }
     });
   }
-  res.json({ error: 'Bad Request' });
+
+  res.status(400).json({ error: 'Already logged in' });
 };
