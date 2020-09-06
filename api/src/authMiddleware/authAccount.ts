@@ -10,7 +10,7 @@ export const checkExistingUsername: RequestHandler = async (req, res, next) => {
     next();
     return;
   } else {
-    res.json({error: 'Username already taken'});
+    res.status(409).json({error: 'Username already taken'});
   }
 };
 
@@ -19,7 +19,7 @@ export const checkPassword: RequestHandler = async (req, res, next) => {
 
   const user = await account.checkPassword(username);
   if (!user) {
-    res.json({error: 'Username not found'});
+    res.status(401).json({error: 'Username not found'});
     return;
   }
 
@@ -28,7 +28,7 @@ export const checkPassword: RequestHandler = async (req, res, next) => {
     next();
     return;
   } else {
-    res.json({error: 'Invalid password'});
+    res.status(401).json({error: 'Invalid password'});
   }
 };
 
@@ -40,7 +40,7 @@ export const replaceExistingUsername: RequestHandler = async (req, res, next) =>
     next();
     return;
   } else {
-    res.json({error: 'Username already taken'});
+    res.status(409).json({error: 'Username already taken'});
   }
 };
 
@@ -50,7 +50,7 @@ export const checkIfUsernameExists: RequestHandler = async (req, res, next) => {
 
   const user = await account.checkUsername(username);
   if (!user) {
-    res.json({error: 'Username not found'});
+    res.status(401).json({error: 'Username not found'});
     return;
   }
 
