@@ -76,7 +76,7 @@ export const getPost = async (
   url: string
 ): Promise<IPost | null> => {
   const query = new PS({ name: 'get-post', text: '\
-    SELECT post, url, date, tags FROM posts p \
+    SELECT post, url, p.date, tags FROM posts p \
     INNER JOIN accounts a on a.user_id = p.user_id \
     WHERE a.username=$1 AND p.url=$2'
   });
