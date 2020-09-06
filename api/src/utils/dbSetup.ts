@@ -25,7 +25,7 @@ export const resetData = async (): Promise<void> => {
     });
   } catch (err) {
     console.log(err);
-    console.log('Testing too fast');
+    console.log('Error from setup');
   };
 };
 
@@ -42,6 +42,6 @@ export const resetSequence = async (): Promise<void> => {
     });
   } catch (err) {
     console.log(err);
-    console.log('Testing too fast');
+    console.log('Error from setup');
   };
 };
