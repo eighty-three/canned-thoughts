@@ -46,14 +46,16 @@ export const deletePost: RequestHandler = async (req, res) => {
 };
 
 export const getPost: RequestHandler = async (req, res) => {
-  const { username, url } = req.body;
+  const username = req.query.username as string;
+  const url = req.query.url as string;
   const post = await content.getPost(username, url);
   res.json(post);
 };
 
 export const getPosts: RequestHandler = async (req, res) => {
-  const { username, page } = req.body;
-  const offset = page * 10; // 10 posts each page
+  const username = req.query.username as string;
+  const page = req.query.page as string;
+  const offset = Number(page) * 10; // 10 posts each page
 
   const posts = await content.getPosts(username, offset);
   res.json(posts);
