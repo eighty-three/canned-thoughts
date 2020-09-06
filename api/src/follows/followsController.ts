@@ -2,7 +2,8 @@ import { RequestHandler } from 'express';
 import * as follows from './followsModel';
 
 export const checkIfFollowed: RequestHandler = async (req, res) => {
-  const { followerUsername, followedUsername } = req.body;
+  const followerUsername = req.query.followerUsername as string;
+  const followedUsername = req.query.followedUsername as string;
 
   const followed = await follows.checkIfFollowed(followerUsername, followedUsername);
   (followed)

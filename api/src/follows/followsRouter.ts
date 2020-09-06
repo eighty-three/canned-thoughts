@@ -8,8 +8,8 @@ import * as follows from './followsController';
 import * as followsSchema from './follows.schema';
 
 
-router.post('/check',
-  validator(followsSchema.checkIfFollowed, 'body'),
+router.get('/check',
+  validator(followsSchema.checkIfFollowed, 'query'),
   follows.checkIfFollowed
 );
 
