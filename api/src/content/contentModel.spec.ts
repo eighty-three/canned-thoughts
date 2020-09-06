@@ -27,7 +27,7 @@ describe('testing posts', () => {
   });
 
   test('getPost with tags', async () => {
-    expect(await content.getPost('url1')).toMatchObject({
+    expect(await content.getPost('dummy', 'url1')).toMatchObject({
       post: 'post',
       url: 'url1',
       tags: 'tag1|tag2|tag3'
@@ -35,15 +35,23 @@ describe('testing posts', () => {
   });
 
   test('getPost with no tags', async () => {
-    expect(await content.getPost('url2')).toMatchObject({
+    expect(await content.getPost('dummy', 'url2')).toMatchObject({
       post: 'post',
       url: 'url2',
       tags: null
     });
   });
 
-  test('getPost with nonexistent url', async () => {
-    expect(await content.getPost('url_doesnt_exist')).toStrictEqual(null);
+  test('getPost with nonexistent url but valid username', async () => {
+    expect(await content.getPost('dummy', 'url_doesnt_exist')).toStrictEqual(null);
+  });
+
+  test('getPost with nonexistent url and nonexistent username', async () => {
+    expect(await content.getPost('user_doesnt_exist', 'url_doesnt_exist')).toStrictEqual(null);
+  });
+
+  test('getPost with valid url but nonexistent username', async () => {
+    expect(await content.getPost('user_doesnt_exist', 'url1')).toStrictEqual(null);
   });
 
   test('getPosts offset', async () => {
