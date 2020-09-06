@@ -19,4 +19,7 @@ router.use('/settings', settingsRouter);
 import followsRouter from './follows/followsRouter';
 router.use('/follows', followsRouter);
 
+import contentRouter from './content/contentRouter';
+router.use('/content', contentRouter);
+
 export default router;
