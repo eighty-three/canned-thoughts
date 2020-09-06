@@ -42,6 +42,10 @@ describe('testing posts', () => {
     });
   });
 
+  test('getPost with nonexistent url', async () => {
+    expect(await content.getPost('url_doesnt_exist')).toStrictEqual(null);
+  });
+
   test('getPosts offset', async () => {
     await content.createPost('dummy', 'post', 'url3');
 

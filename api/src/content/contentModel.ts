@@ -72,14 +72,17 @@ export const createPost = async (
 };
 
 export const getPost = async (
+  username: string,
   url: string
-): Promise<IPost> => {
+): Promise<IPost | null> => {
   const query = new PS({ name: 'get-post', text: '\
-    SELECT post, url, date, tags FROM posts WHERE url=$1'
+    SELECT post, url, date, tags FROM posts p \
+    INNER JOIN accounts a on a.user_id = p.user_id \
+    WHERE a.username=$1 AND p.url=$2'
   });
 
-  query.values = [url];
-  return await db.one(query);
+  query.values = [username, url];
+  return await db.oneOrNone(query);
 };
 
 export const getPosts = async (
@@ -113,7 +116,7 @@ export const deletePost = async (
 // Tags
 export const getTag = async (
   tag: string
-): Promise<number|void> => {
+): Promise<number | void> => {
   // https://stackoverflow.com/a/40325406/435563
   // tl;dr: inefficiencies and race conditions
   const query = new PS({ name: 'get-tag', text: '\
