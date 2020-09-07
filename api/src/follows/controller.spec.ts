@@ -18,7 +18,6 @@ describe('function calls with authentication', () => {
   let cookie;
 
   beforeAll(() =>
-    // https://github.com/facebook/jest/issues/3547
     agent
       .post('/api/account/signup')
       .send({
