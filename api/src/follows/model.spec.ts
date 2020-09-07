@@ -1,12 +1,12 @@
-import * as account from '../account/model';
+import { createAccount } from '../account/model';
 import * as settings from '../settings/model';
 import * as profile from '../profile/model';
 import * as follows from './model';
 
 describe('testing functions', () => {
   beforeAll(async () => {
-    await account.createAccount('dummy1', 'pw1');
-    await account.createAccount('dummy2', 'pw1');
+    await createAccount('dummy1', 'pw1');
+    await createAccount('dummy2', 'pw1');
   });
 
   afterAll(async () => {

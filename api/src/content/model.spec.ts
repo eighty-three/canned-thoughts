@@ -1,11 +1,11 @@
 import * as content from './model';
-import * as account from '../account/model';
+import { createAccount } from '../account/model';
 import * as follows from '../follows/model';
 import { IOptions } from './types';
 
 beforeAll(async () => {
-  await account.createAccount('dummy', '123');
-  await account.createAccount('dummy2', '123');
+  await createAccount('dummy', '123');
+  await createAccount('dummy2', '123');
 });
 
 describe('testing posts', () => {
