@@ -11,7 +11,7 @@ describe('testing functions', () => {
     await settings.deleteAccount('dummy1');
   });
 
-  test('getProfileInfo', async () => {
+  test('getProfileInfo account exists', async () => {
     const profileInfo = await profile.getProfileInfo('dummy1');
 
     expect(profileInfo).toMatchObject({
@@ -20,8 +20,14 @@ describe('testing functions', () => {
       followers: 0
     });
 
-    expect(profileInfo.date).toBeTruthy();
-    expect(profileInfo.date).not.toBeFalsy();
+    expect(profileInfo?.date).toBeTruthy();
+    expect(profileInfo?.date).not.toBeFalsy();
+  });
+
+  test('getProfileInfo account doesnt exist', async () => {
+    const profileInfo = await profile.getProfileInfo('dummy5');
+
+    expect(profileInfo).toBe(null);
   });
 
   test('getNameAndDescription', async () => {
@@ -29,6 +35,12 @@ describe('testing functions', () => {
       name: 'dummy1',
       description: null
     });
+  });
+
+  test('getNameAndDescription account doesnt exist', async () => {
+    const profileInfo = await profile.getNameAndDescription('dummy5');
+
+    expect(profileInfo).toBe(null);
   });
 
   test('updateNameAndDescription', async () => {

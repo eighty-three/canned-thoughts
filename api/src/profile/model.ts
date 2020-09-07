@@ -12,24 +12,24 @@ type INameAndDescription = Omit<IProfileInfo, 'followers'|'date'>;
 
 export const getProfileInfo = async (
   username: string
-): Promise<IProfileInfo> => {
+): Promise<IProfileInfo | null> => {
   const query = new PS({ name: 'get-profile-info', text: '\
     SELECT name, description, followers, date FROM accounts WHERE username=$1'
   });
 
   query.values = [username];
-  return await db.one(query);
+  return await db.oneOrNone(query);
 };
 
 export const getNameAndDescription = async (
   username: string
-): Promise<INameAndDescription> => {
+): Promise<INameAndDescription | null> => {
   const query = new PS({ name: 'get-name-description', text: '\
     SELECT name, description FROM accounts WHERE username=$1'
   });
 
   query.values = [username];
-  return await db.one(query);
+  return await db.oneOrNone(query);
 };
 
 export const updateNameAndDescription = async (
