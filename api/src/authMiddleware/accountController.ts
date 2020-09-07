@@ -60,7 +60,8 @@ export const checkIfUsernameExists: RequestHandler = async (req, res, next) => {
 
 export const checkIfUsernamesExist: RequestHandler = async (req, res, next) => {
   const usernames: string[] = [];
-  for (const username in req.body) {
+  for (const value of Object.values(req.body)) {
+    const username = value as string;
     usernames.push(username);
   }
 
