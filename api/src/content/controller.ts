@@ -2,7 +2,7 @@ import { RequestHandler } from 'express';
 import shortid from 'shortid';
 import * as content from './model';
 
-const getTags = (post: string): { fixedPost: string, tags: string[] } => {
+export const getTags = (post: string): { fixedPost: string, tags: string[] } => {
   const arr = post.split('#');
   const num = (arr.length - 3 > 0)
     ? arr.length - 3
@@ -33,7 +33,9 @@ export const createPost: RequestHandler = async (req, res) => {
 
 export const searchPosts: RequestHandler = async (req, res) => {
   const { username, tags, options, page } = req.body;
-  const offset = page * 10; // 10 posts each page
+  const offset = (page - 1 <= 0) 
+    ? 0
+    : (page - 1) * 10;
 
   const posts = await content.searchPostsWithTags(username, tags, options, offset);
   res.json(posts);
@@ -55,7 +57,9 @@ export const getPost: RequestHandler = async (req, res) => {
 export const getPosts: RequestHandler = async (req, res) => {
   const username = req.query.username as string;
   const page = req.query.page as string;
-  const offset = Number(page) * 10; // 10 posts each page
+  const offset = (Number(page) - 1 <= 0) 
+    ? 0
+    : (Number(page) - 1) * 10;
 
   const posts = await content.getPosts(username, offset);
   res.json(posts);
