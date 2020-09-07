@@ -2,8 +2,8 @@ import express from 'express';
 const router = express.Router();
 
 // Middleware
-import { user, authToken } from '@authMiddleware/index';
-router.post('/verify', authToken.verifyToken, user.authCheck);
+import { authToken, authAccount } from '@authMiddleware/index';
+router.post('/verify', authToken.verifyToken, authAccount.verifyUser);
 
 
 // Routes
