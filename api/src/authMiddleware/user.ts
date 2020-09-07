@@ -12,4 +12,3 @@ export const authCheck: RequestHandler = async (req, res) => {
 
   res.json({ username });
 };
-
