@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import * as account from '../account/model';
+import * as account from './accountModel';
 import * as argon2 from 'argon2';
 
 export const checkExistingUsername: RequestHandler = async (req, res, next) => {
