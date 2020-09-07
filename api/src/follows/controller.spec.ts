@@ -86,15 +86,6 @@ describe('function calls with authentication', () => {
 });
 
 describe('check', () => {
-  test('rejected by validator, incomplete fields', async () => {
-    const agent = request(server);
-    const data = { followedUsername: 'dummy2' };
-    const check = await agent.get(`${url}/check`).query(data);
-
-    expect(check.body).toMatchObject({ error: 'Bad Request' });
-    expect(check.status).toStrictEqual(400);
-  });
-
   test('rejected by validator, null request', async () => {
     const agent = request(server);
     const data = {};
@@ -104,7 +95,16 @@ describe('check', () => {
     expect(check.status).toStrictEqual(400);
   });
 
-  test('rejected by validator, invalid fields', async () => {
+  test('rejected by validator, incomplete fields', async () => {
+    const agent = request(server);
+    const data = { followedUsername: 'dummy2' };
+    const check = await agent.get(`${url}/check`).query(data);
+
+    expect(check.body).toMatchObject({ error: 'Bad Request' });
+    expect(check.status).toStrictEqual(400);
+  });
+
+  test('rejected by validator, invalid values', async () => {
     const agent = request(server);
     const data = { followerUsername: 'dummy1$', followedUsername: 'dummy2' };
     const check = await agent.get(`${url}/check`).query(data);
@@ -146,15 +146,6 @@ describe('check', () => {
 });
 
 describe('toggle', () => {
-  test('rejected by validator, incomplete fields', async () => {
-    const agent = request(server);
-    const data = { followedUsername: 'dummy2' };
-    const check = await agent.post(`${url}/toggle`).send(data);
-
-    expect(check.body).toMatchObject({ error: 'Bad Request' });
-    expect(check.status).toStrictEqual(400);
-  });
-
   test('rejected by validator, null request', async () => {
     const agent = request(server);
     const data = {};
@@ -164,7 +155,16 @@ describe('toggle', () => {
     expect(check.status).toStrictEqual(400);
   });
 
-  test('rejected by validator, invalid fields', async () => {
+  test('rejected by validator, incomplete fields', async () => {
+    const agent = request(server);
+    const data = { followedUsername: 'dummy2' };
+    const check = await agent.post(`${url}/toggle`).send(data);
+
+    expect(check.body).toMatchObject({ error: 'Bad Request' });
+    expect(check.status).toStrictEqual(400);
+  });
+
+  test('rejected by validator, invalid values', async () => {
     const agent = request(server);
     const data = { followerUsername: 'dummy1$', followedUsername: 'dummy2' };
     const check = await agent.post(`${url}/toggle`).send(data);
@@ -173,7 +173,7 @@ describe('toggle', () => {
     expect(check.status).toStrictEqual(400);
   });
 
-  test('rejected by validator, no auth token', async () => {
+  test('valid request, no authentication', async () => {
     const agent = request(server);
     const data = { followerUsername: 'dummy1', followedUsername: 'dummy2' };
     const check = await agent.post(`${url}/toggle`).send(data);

@@ -80,6 +80,14 @@ describe('signup', () => {
     await settings.deleteAccount('test_username');
   });
 
+  test('rejected by validator, null data', async () => {
+    const data = {};
+    const post = await request(server).post(`${url}/signup`).send(data);
+
+    expect(post.body).toMatchObject({error: 'Bad Request'});
+    expect(post.status).toStrictEqual(400);
+  });
+
   test('rejected by validator, incomplete fields', async () => {
     const data = { username: 'test_username' };
     const post = await request(server).post(`${url}/signup`).send(data);
@@ -88,16 +96,8 @@ describe('signup', () => {
     expect(post.status).toStrictEqual(400);
   });
 
-  test('rejected by validator, invalid username', async () => {
+  test('rejected by validator, invalid values', async () => {
     const data = { username: 'test_username$', password: '123' };
-    const post = await request(server).post(`${url}/signup`).send(data);
-
-    expect(post.body).toMatchObject({error: 'Bad Request'});
-    expect(post.status).toStrictEqual(400);
-  });
-
-  test('rejected by validator, invalid password', async () => {
-    const data = { username: 'test_username', password: 123 };
     const post = await request(server).post(`${url}/signup`).send(data);
 
     expect(post.body).toMatchObject({error: 'Bad Request'});
@@ -132,6 +132,14 @@ describe('login', () => {
     await settings.deleteAccount('test_username');
   });
 
+  test('rejected by validator, null data', async () => {
+    const data = {};
+    const post = await request(server).post(`${url}/login`).send(data);
+
+    expect(post.body).toMatchObject({error: 'Bad Request'});
+    expect(post.status).toStrictEqual(400);
+  });
+
   test('rejected by validator, incomplete fields', async () => {
     const data = { username: 'dummy' };
     const post = await request(server).post(`${url}/login`).send(data);
@@ -140,16 +148,8 @@ describe('login', () => {
     expect(post.status).toStrictEqual(400);
   });
 
-  test('rejected by validator, invalid username', async () => {
+  test('rejected by validator, invalid values', async () => {
     const data = { username: 'dummy$', password: '1234' };
-    const post = await request(server).post(`${url}/login`).send(data);
-
-    expect(post.body).toMatchObject({error: 'Bad Request'});
-    expect(post.status).toStrictEqual(400);
-  });
-
-  test('rejected by validator, invalid password', async () => {
-    const data = { username: 'dummy', password: 1234 };
     const post = await request(server).post(`${url}/login`).send(data);
 
     expect(post.body).toMatchObject({error: 'Bad Request'});
