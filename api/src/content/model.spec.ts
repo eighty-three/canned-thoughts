@@ -168,7 +168,7 @@ describe('searchPosts', () => {
 
   describe('needs followUser', () => {
     beforeAll(async () => {
-      await follows.followUser('dummy2', 'dummy');
+      await follows.followUser('dummy', 'dummy2');
     });
 
     test('searchPostsWithTags search-inclusive-followed', async () => {

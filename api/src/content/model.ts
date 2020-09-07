@@ -186,8 +186,8 @@ export const searchPostsWithTags = async (
       const query = new PS({ name: 'search-inclusive-followed', text: '\
         SELECT post, url, p.date, tags FROM posts p \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
-        INNER JOIN follows f ON f.user_id_followed = p.user_id \
-        INNER JOIN accounts a ON a.user_id = f.user_id_followed \
+        INNER JOIN follows f ON f.user_id_follower = p.user_id \
+        INNER JOIN accounts a ON a.user_id = f.user_id_follower \
         WHERE pt.tag_id && $2 AND a.username = $1\
         ORDER BY p.date asc LIMIT 10 OFFSET $3 \
         ', values: [username, fixedIds, offset]
@@ -217,8 +217,8 @@ export const searchPostsWithTags = async (
       const query = new PS({ name: 'search-exclusive-followed', text: '\
         SELECT post, url, p.date, tags FROM posts p \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
-        INNER JOIN follows f ON f.user_id_followed = p.user_id \
-        INNER JOIN accounts a ON a.user_id = f.user_id_followed \
+        INNER JOIN follows f ON f.user_id_follower = p.user_id \
+        INNER JOIN accounts a ON a.user_id = f.user_id_follower \
         WHERE pt.tag_id = $2 AND a.username = $1\
         ORDER BY p.date asc LIMIT 10 OFFSET $3 \
         ', values: [username, fixedIds, offset]
