@@ -1,7 +1,7 @@
-import * as account from '../account/accountModel';
-import * as settings from '../settings/settingsModel';
-import * as profile from '../profile/profileModel';
-import * as follows from './followsModel';
+import * as account from '../account/model';
+import * as settings from '../settings/model';
+import * as profile from '../profile/model';
+import * as follows from './model';
 
 describe('testing functions', () => {
   beforeAll(async () => {

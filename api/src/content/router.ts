@@ -4,8 +4,8 @@ const router = express.Router();
 
 import { authToken } from '@authMiddleware/index';
 
-import * as content from './contentController';
-import * as contentSchema from './content.schema';
+import * as content from './controller';
+import * as contentSchema from './schema';
 
 
 router.post('/create',

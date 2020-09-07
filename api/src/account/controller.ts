@@ -5,7 +5,7 @@ import * as argon2 from 'argon2';
 import { sign } from 'jsonwebtoken';
 import cookie from 'cookie';
 
-import * as accounts from './accountModel';
+import * as accounts from './model';
 
 export const login: RequestHandler = async (req, res) => {
   const { username } = req.body;

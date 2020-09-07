@@ -4,8 +4,8 @@ const router = express.Router();
 
 import { authToken } from '@authMiddleware/index';
 
-import * as follows from './followsController';
-import * as followsSchema from './follows.schema';
+import * as follows from './controller';
+import * as followsSchema from './schema';
 
 
 router.get('/check',

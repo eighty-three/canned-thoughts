@@ -1,7 +1,7 @@
-import * as content from './contentModel';
-import * as account from '../account/accountModel';
-import * as follows from '../follows/followsModel';
-import { IOptions } from './content.types';
+import * as content from './model';
+import * as account from '../account/model';
+import * as follows from '../follows/model';
+import { IOptions } from './types';
 
 beforeAll(async () => {
   await account.createAccount('dummy', '123');

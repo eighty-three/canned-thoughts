@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import * as profile from './profileModel';
+import * as profile from './model';
 
 export const updateNameAndDescription: RequestHandler = async (req, res) => {
   const { username, newName, newDescription } = req.body;

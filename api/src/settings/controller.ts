@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import * as argon2 from 'argon2';
 
-import * as settings from './settingsModel';
+import * as settings from './model';
 
 export const changePassword: RequestHandler = async (req, res) => {
   const { username, newPassword } = req.body;

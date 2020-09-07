@@ -1,5 +1,5 @@
-import * as account from '../account/accountModel';
-import * as settings from './settingsModel';
+import * as account from '../account/model';
+import * as settings from './model';
 
 describe('testing functions', () => {
   beforeAll(async () => {

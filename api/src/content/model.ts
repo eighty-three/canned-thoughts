@@ -1,6 +1,6 @@
 import db from '@utils/db';
 import { PreparedStatement as PS } from 'pg-promise';
-import { IPost, IRelation, IOptions } from './content.types';
+import { IPost, IRelation, IOptions } from './types';
 
 export const createPost = async (
   username: string,

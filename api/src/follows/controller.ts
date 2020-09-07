@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import * as follows from './followsModel';
+import * as follows from './model';
 
 export const checkIfFollowed: RequestHandler = async (req, res) => {
   const followerUsername = req.query.followerUsername as string;

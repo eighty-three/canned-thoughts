@@ -1,4 +1,4 @@
-import * as account from './accountModel';
+import * as account from './model';
 
 describe('create account', () => {
   test('should always work because the checks/validations are done beforehand', async () => {

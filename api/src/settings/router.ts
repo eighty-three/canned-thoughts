@@ -4,8 +4,8 @@ const router = express.Router();
 
 import { authToken, authAccount } from '@authMiddleware/index';
 
-import * as settings from './settingsController';
-import * as settingsSchema from './settings.schema';
+import * as settings from './controller';
+import * as settingsSchema from './schema';
 
 
 router.post('/username',

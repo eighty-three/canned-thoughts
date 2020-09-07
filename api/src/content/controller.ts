@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import shortid from 'shortid';
-import * as content from './contentModel';
+import * as content from './model';
 
 const getTags = (post: string): { fixedPost: string, tags: string[] } => {
   const arr = post.split('#');

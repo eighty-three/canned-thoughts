@@ -4,8 +4,8 @@ const router = express.Router();
 
 import { authToken, authAccount } from '@authMiddleware/index';
 
-import * as profile from './profileController';
-import * as profileSchema from './profile.schema';
+import * as profile from './controller';
+import * as profileSchema from './schema';
 
 
 router.post('/update',

@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import * as account from '../account/accountModel';
+import * as account from '../account/model';
 
 export const authCheck: RequestHandler = async (req, res) => {
   const { username } = req.body;

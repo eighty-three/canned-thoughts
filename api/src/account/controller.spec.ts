@@ -4,7 +4,7 @@ import app from '../app';
 const server = http.createServer(app).listen(8090);
 const url = '/api/account';
 
-import * as settings from '../settings/settingsModel';
+import * as settings from '../settings/model';
 
 console.log = function() {return;}; // Disable console.logs
 
