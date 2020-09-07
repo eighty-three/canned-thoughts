@@ -14,7 +14,7 @@ describe('testing functions', () => {
     await settings.deleteAccount('dummy2');
   });
 
-  test('followUser', async () => { // updateFollowersCount implicitly tested
+  test('followUser', async () => {
     expect(await profile.getProfileInfo('dummy2')).toEqual(
       expect.objectContaining({
         followers: 0
@@ -47,18 +47,6 @@ describe('testing functions', () => {
     );
   });
 
-  test('updateFollowersCount', async () => {
-    const spy = jest.spyOn(follows, 'updateFollowersCount');
-
-    await follows.followUser('dummy1', 'dummy2');
-
-    expect(spy).toHaveBeenCalledTimes(1);
-
-    await follows.unfollowUser('dummy1', 'dummy2');
-
-    expect(spy).toHaveBeenCalledTimes(2);
-  });
-
   test('checkIfFollowed should fail', async () => {
     expect(await follows.checkIfFollowed('dummy1', 'dummy2')).toStrictEqual(null);
   });
@@ -66,8 +54,20 @@ describe('testing functions', () => {
   test('checkIfFollowed should work', async () => {
     expect(await follows.checkIfFollowed('dummy1', 'dummy2')).toStrictEqual(null);
 
+    expect(await profile.getProfileInfo('dummy2')).toEqual(
+      expect.objectContaining({
+        followers: 0
+      })
+    );
+
     await follows.followUser('dummy1', 'dummy2');
 
     expect(await follows.checkIfFollowed('dummy1', 'dummy2')).not.toBe(null);
+
+    expect(await profile.getProfileInfo('dummy2')).toEqual(
+      expect.objectContaining({
+        followers: 1
+      })
+    );
   });
 });
