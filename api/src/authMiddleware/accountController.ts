@@ -44,7 +44,6 @@ export const replaceExistingUsername: RequestHandler = async (req, res, next) =>
   }
 };
 
-
 export const checkIfUsernameExists: RequestHandler = async (req, res, next) => {
   const { username } = req.body;
 
