@@ -46,35 +46,41 @@ describe('function calls with authentication', () => {
 
     test('both usernames dont exist', async () => {
       const data = { followerUsername: 'dummy3', followedUsername: 'dummy4' };
-      const post = await agent.post(`${url}/toggle`).send(data);
+      const toggle = await agent.post(`${url}/toggle`).send(data);
     
-      expect(post.body).toMatchObject({ error: 'Username not found' });
-      expect(post.status).toStrictEqual(401);
+      expect(toggle.body).toMatchObject({ error: 'Username not found' });
+      expect(toggle.status).toStrictEqual(401);
     });
     
     test('one username doesnt exist', async () => {
       const data = { followerUsername: 'dummy1', followedUsername: 'dummy3' };
-      const post = await agent.post(`${url}/toggle`).send(data);
+      const toggle = await agent.post(`${url}/toggle`).send(data);
     
-      expect(post.body).toMatchObject({ error: 'Username not found' });
-      expect(post.status).toStrictEqual(401);
+      expect(toggle.body).toMatchObject({ error: 'Username not found' });
+      expect(toggle.status).toStrictEqual(401);
     });
     
     test('usernames exist', async () => {
       const data = { followerUsername: 'dummy1', followedUsername: 'dummy2' };
-      const post = await agent.post(`${url}/toggle`).send(data);
+      const toggle = await agent.post(`${url}/toggle`).send(data);
     
-      expect(post.body).toMatchObject({ message: 'Followed' });
-      expect(post.status).toStrictEqual(200);
+      expect(toggle.body).toMatchObject({ message: 'Followed' });
+      expect(toggle.status).toStrictEqual(200);
+      
+      const dataForCheck = { followerUsername: 'dummy1', followedUsername: 'dummy2' };
+      const check = await agent.get(`${url}/check`).query(dataForCheck);
+
+      expect(check.body).toStrictEqual(true);
+      expect(check.status).toStrictEqual(200);
     });
 
     test('usernames exist, toggle again', async () => {
       const data = { followerUsername: 'dummy1', followedUsername: 'dummy2' };
-      const post = await agent.post(`${url}/toggle`).send(data);
+      const toggle = await agent.post(`${url}/toggle`).send(data);
     
-      expect(post.body).not.toMatchObject({ message: 'Followed' });
-      expect(post.body).toMatchObject({ message: 'Unfollowed' });
-      expect(post.status).toStrictEqual(200);
+      expect(toggle.body).not.toMatchObject({ message: 'Followed' });
+      expect(toggle.body).toMatchObject({ message: 'Unfollowed' });
+      expect(toggle.status).toStrictEqual(200);
     });
   });
 });
@@ -83,37 +89,37 @@ describe('check', () => {
   test('rejected by validator, incomplete fields', async () => {
     const agent = request(server);
     const data = { followedUsername: 'dummy2' };
-    const post = await agent.get(`${url}/check`).query(data);
+    const check = await agent.get(`${url}/check`).query(data);
 
-    expect(post.body).toMatchObject({ error: 'Bad Request' });
-    expect(post.status).toStrictEqual(400);
+    expect(check.body).toMatchObject({ error: 'Bad Request' });
+    expect(check.status).toStrictEqual(400);
   });
 
   test('rejected by validator, null request', async () => {
     const agent = request(server);
     const data = {};
-    const post = await agent.get(`${url}/check`).query(data);
+    const check = await agent.get(`${url}/check`).query(data);
 
-    expect(post.body).toMatchObject({ error: 'Bad Request' });
-    expect(post.status).toStrictEqual(400);
+    expect(check.body).toMatchObject({ error: 'Bad Request' });
+    expect(check.status).toStrictEqual(400);
   });
 
   test('rejected by validator, invalid fields', async () => {
     const agent = request(server);
     const data = { followerUsername: 'dummy1$', followedUsername: 'dummy2' };
-    const post = await agent.get(`${url}/check`).query(data);
+    const check = await agent.get(`${url}/check`).query(data);
 
-    expect(post.body).toMatchObject({ error: 'Bad Request' });
-    expect(post.status).toStrictEqual(400);
+    expect(check.body).toMatchObject({ error: 'Bad Request' });
+    expect(check.status).toStrictEqual(400);
   });
 
   test('check with two fake accounts', async () => {
     const agent = request(server);
     const data = { followerUsername: 'dummy1', followedUsername: 'dummy2' };
-    const post = await agent.get(`${url}/check`).query(data);
+    const check = await agent.get(`${url}/check`).query(data);
 
-    expect(post.body).toStrictEqual(false);
-    expect(post.status).toStrictEqual(200);
+    expect(check.body).toStrictEqual(false);
+    expect(check.status).toStrictEqual(200);
   });
 
   test('check with one fake one real', async () => {
@@ -121,10 +127,10 @@ describe('check', () => {
 
     const agent = request(server);
     const data = { followerUsername: 'dummy1', followedUsername: 'dummy2' };
-    const post = await agent.get(`${url}/check`).query(data);
+    const check = await agent.get(`${url}/check`).query(data);
 
-    expect(post.body).toStrictEqual(false);
-    expect(post.status).toStrictEqual(200);
+    expect(check.body).toStrictEqual(false);
+    expect(check.status).toStrictEqual(200);
   });
 
   test('check with two real accounts', async () => {
@@ -132,10 +138,10 @@ describe('check', () => {
 
     const agent = request(server);
     const data = { followerUsername: 'dummy1', followedUsername: 'dummy2' };
-    const post = await agent.get(`${url}/check`).query(data);
+    const check = await agent.get(`${url}/check`).query(data);
 
-    expect(post.body).toStrictEqual(false);
-    expect(post.status).toStrictEqual(200);
+    expect(check.body).toStrictEqual(false);
+    expect(check.status).toStrictEqual(200);
   });
 });
 
@@ -143,36 +149,36 @@ describe('toggle', () => {
   test('rejected by validator, incomplete fields', async () => {
     const agent = request(server);
     const data = { followedUsername: 'dummy2' };
-    const post = await agent.post(`${url}/toggle`).send(data);
+    const check = await agent.post(`${url}/toggle`).send(data);
 
-    expect(post.body).toMatchObject({ error: 'Bad Request' });
-    expect(post.status).toStrictEqual(400);
+    expect(check.body).toMatchObject({ error: 'Bad Request' });
+    expect(check.status).toStrictEqual(400);
   });
 
   test('rejected by validator, null request', async () => {
     const agent = request(server);
     const data = {};
-    const post = await agent.post(`${url}/toggle`).send(data);
+    const check = await agent.post(`${url}/toggle`).send(data);
 
-    expect(post.body).toMatchObject({ error: 'Bad Request' });
-    expect(post.status).toStrictEqual(400);
+    expect(check.body).toMatchObject({ error: 'Bad Request' });
+    expect(check.status).toStrictEqual(400);
   });
 
   test('rejected by validator, invalid fields', async () => {
     const agent = request(server);
     const data = { followerUsername: 'dummy1$', followedUsername: 'dummy2' };
-    const post = await agent.post(`${url}/toggle`).send(data);
+    const check = await agent.post(`${url}/toggle`).send(data);
 
-    expect(post.body).toMatchObject({ error: 'Bad Request' });
-    expect(post.status).toStrictEqual(400);
+    expect(check.body).toMatchObject({ error: 'Bad Request' });
+    expect(check.status).toStrictEqual(400);
   });
 
   test('rejected by validator, no auth token', async () => {
     const agent = request(server);
     const data = { followerUsername: 'dummy1', followedUsername: 'dummy2' };
-    const post = await agent.post(`${url}/toggle`).send(data);
+    const check = await agent.post(`${url}/toggle`).send(data);
 
-    expect(post.body).toMatchObject({ error: 'You are not authenticated' });
-    expect(post.status).toStrictEqual(401);
+    expect(check.body).toMatchObject({ error: 'You are not authenticated' });
+    expect(check.status).toStrictEqual(401);
   });
 });
