@@ -8,13 +8,13 @@ export const updateNameAndDescription: RequestHandler = async (req, res) => {
 };
 
 export const getNameAndDescription: RequestHandler = async (req, res) => {
-  const { username } = req.body;
+  const username = req.query.username as string;
   const nameAndDescription = await profile.getNameAndDescription(username);
   res.status(200).json(nameAndDescription);
 };
 
 export const getProfileInfo: RequestHandler = async (req, res) => {
-  const { username } = req.body;
+  const username = req.query.username as string;
   const profileInfo = await profile.getProfileInfo(username);
   res.status(200).json(profileInfo);
 };

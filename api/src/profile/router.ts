@@ -11,18 +11,17 @@ import * as profileSchema from './schema';
 router.post('/update',
   validator(profileSchema.updateNameAndDescription, 'body'),
   authToken.verifyToken,
+  authAccount.checkIfUsernameExists,
   profile.updateNameAndDescription
 );
 
-router.post('/getinfo',
-  validator(profileSchema.getNameAndDescription, 'body'),
-  authAccount.checkIfUsernameExists,
+router.get('/getinfo',
+  validator(profileSchema.getNameAndDescription, 'query'),
   profile.getNameAndDescription
 );
 
-router.post('/getall',
-  validator(profileSchema.getProfileInfo, 'body'),
-  authAccount.checkIfUsernameExists,
+router.get('/getall',
+  validator(profileSchema.getProfileInfo, 'query'),
   profile.getProfileInfo
 );
 
