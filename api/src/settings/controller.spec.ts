@@ -1,4 +1,4 @@
-import request from 'supertest';
+import request, { SuperTest, Test } from 'supertest';
 import http from 'http';
 import app from '../app';
 const server = http.createServer(app).listen(8090);
@@ -15,11 +15,15 @@ afterAll(async () => {
 });
 
 describe('function calls with authentication', () => {
-  const agent = request.agent(server);
   let cookie;
+  let agent: SuperTest<Test>;
 
-  beforeAll(() =>
-    agent
+  beforeEach(async () => {
+    agent = request.agent(server);  
+    /* Need to reinitialize the agent to use a different token to fix
+     * errors about setting headers after they are sent to client
+     */
+    return agent
       .post('/api/account/signup')
       .send({
         username: 'dummy1',
@@ -31,8 +35,14 @@ describe('function calls with authentication', () => {
           .map((item: string) => item.split(';')[0]);
         cookie = cookies.join(';');
         console.log(cookie);
-      })
-  );
+      });
+  });
+
+  afterEach(async () => {
+    await settings.deleteAccount('dummy1');
+    await settings.deleteAccount('dummy2');
+    await settings.deleteAccount('dummy3');
+  });
 
   describe('change username', () => {
     test('invalid password', async () => {
@@ -71,7 +81,7 @@ describe('function calls with authentication', () => {
   
   describe('change password', () => {
     test('invalid password', async () => {
-      const data = { username: 'dummy3', password: '1234', newPassword: '456' };
+      const data = { username: 'dummy1', password: '1234', newPassword: '456' };
       const message = await agent.post(`${url}/password`).send(data);
 
       expect(message.body).toMatchObject({ error: 'Invalid password' });
@@ -79,17 +89,23 @@ describe('function calls with authentication', () => {
     });
 
     test('success', async () => {
-      const data = { username: 'dummy3', password: '123', newPassword: '456' };
+      const data = { username: 'dummy1', password: '123', newPassword: '456' };
       const message = await agent.post(`${url}/password`).send(data);
 
       expect(message.body).toMatchObject({ message: 'Password successfully changed!' });
       expect(message.status).toStrictEqual(200);
+
+      const oldData = { username: 'dummy1', password: '123' };
+      const check = await agent.post(`${url}/delete`).send(oldData);
+
+      expect(check.body).toMatchObject({ error: 'Invalid password' });
+      expect(check.status).toStrictEqual(401);
     });
   });
 
   describe('delete account', () => {
     test('invalid password', async () => {
-      const data = { username: 'dummy3', password: '1234' };
+      const data = { username: 'dummy1', password: '1234' };
       const message = await agent.post(`${url}/delete`).send(data);
 
       expect(message.body).toMatchObject({ error: 'Invalid password' });
@@ -97,24 +113,16 @@ describe('function calls with authentication', () => {
     });
     
     test('success', async () => {
-      expect(await authAccount.checkUsername('dummy3')).toStrictEqual({ username: 'dummy3' });
+      expect(await authAccount.checkUsername('dummy1')).toStrictEqual({ username: 'dummy1' });
 
-      // Check if old password still works
-      const oldData = { username: 'dummy3', password: '123' };
-      const check = await agent.post(`${url}/delete`).send(oldData);
-
-      expect(check.body).toMatchObject({ error: 'Invalid password' });
-      expect(check.status).toStrictEqual(401);
-
-      // Use new password
-      const data = { username: 'dummy3', password: '456' };
+      const data = { username: 'dummy1', password: '123' };
       const message = await agent.post(`${url}/delete`).send(data);
 
       expect(message.body).toMatchObject({ message: 'Account successfully deleted!' });
       expect(message.status).toStrictEqual(200);
 
-      expect(await authAccount.checkUsername('dummy3')).not.toStrictEqual({ username: 'dummy3' });
-      expect(await authAccount.checkUsername('dummy3')).toStrictEqual(null);
+      expect(await authAccount.checkUsername('dummy1')).not.toStrictEqual({ username: 'dummy1' });
+      expect(await authAccount.checkUsername('dummy1')).toStrictEqual(null);
     });
   });
 });
