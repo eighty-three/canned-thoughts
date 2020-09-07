@@ -57,3 +57,19 @@ export const checkIfUsernameExists: RequestHandler = async (req, res, next) => {
   next();
   return;
 };
+
+export const checkIfUsernamesExist: RequestHandler = async (req, res, next) => {
+  const usernames: string[] = [];
+  for (const username in req.body) {
+    usernames.push(username);
+  }
+
+  const user = await account.checkUsernames(usernames);
+  if (!user) {
+    res.status(401).json({error: 'Username not found'});
+    return;
+  }
+
+  next();
+  return;
+};
