@@ -7,7 +7,7 @@ export const createPost = async (
   post: string,
   url: string,
   tags?: string[]
-): Promise<void> => {
+): Promise<IPost> => {
   if (tags) {
     /* If the tag is not in the database,
      * create tag, returning tag_id. Else,
@@ -47,27 +47,38 @@ export const createPost = async (
      */
     const fixedTags = `${tags.join('|')}`;
     const createPost = new PS({ name: 'create-post-with-tags', text: '\
-      INSERT INTO posts (user_id, post, url, tags) \
-      VALUES ((SELECT user_id FROM accounts WHERE username=$1), $2, $3, $4) \
-      RETURNING post_id',
+      WITH ins (user_id, post_id, post, url, tags, date) AS ( \
+        INSERT INTO posts (user_id, post, url, tags) \
+        VALUES ((SELECT user_id FROM accounts WHERE username=$1), $2, $3, $4) \
+        RETURNING user_id, post_id, post, url, tags, date \
+      ) \
+      SELECT post_id, post, url, tags, ins.date, a.username, a.name FROM ins \
+      INNER JOIN accounts a on a.user_id = ins.user_id'
     });
     createPost.values = [username, post, url, fixedTags];
 
-    await db.task(async t => {
+    return await db.task(async t => {
       const postRow = await t.one(createPost);
       await t.none(
         'INSERT INTO posts_tags (post_id, tag_id) \
         VALUES ($1, $2)', [postRow.post_id, mappedTags]);
+      delete postRow.post_id;
+      return postRow;
     });
 
   } else { // If no tags
     const query = new PS({ name: 'create-post-no-tags', text: '\
-      INSERT INTO posts (user_id, post, url) \
-      VALUES ((SELECT user_id FROM accounts WHERE username=$1), $2, $3)'
+      WITH ins (user_id, tags, post, url, date) AS ( \
+        INSERT INTO posts (user_id, post, url) \
+        VALUES ((SELECT user_id FROM accounts WHERE username=$1), $2, $3) \
+        RETURNING user_id, tags, post, url, date \
+      ) \
+      SELECT post, url, tags, ins.date, a.username, a.name FROM ins \
+      INNER JOIN accounts a on a.user_id = ins.user_id'
     });
     
     query.values = [username, post, url];
-    await db.none(query);
+    return await db.one(query);
   }
 };
 

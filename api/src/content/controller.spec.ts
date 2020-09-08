@@ -47,7 +47,13 @@ describe('function calls with authentication', () => {
       const data = { username: 'dummy', post: 'testpost' };
       const post = await agent.post(`${url}/create`).send(data);
 
-      expect(post.body).toMatchObject({ message: 'Post created' });
+      expect(post.body).toMatchObject({
+        username: 'dummy',
+        name: 'dummy',
+        post: 'testpost',
+        tags: null
+      });
+
       expect(post.status).toStrictEqual(200);
 
       expect(await content.getPosts('dummy', 0)).toEqual(expect.arrayContaining(

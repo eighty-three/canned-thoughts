@@ -11,7 +11,15 @@ beforeAll(async () => {
 describe('testing posts', () => {
   test('createPost with tags', async () => {
     const tags = ['tag1', 'tag2', 'tag3'];
-    await content.createPost('dummy', 'post', 'url1', tags);
+    const newPost = await content.createPost('dummy', 'post', 'url1', tags);
+
+    expect(newPost).toMatchObject({
+      username: 'dummy',
+      name: 'dummy',
+      tags: 'tag1|tag2|tag3',
+      post: 'post',
+      url: 'url1'
+    });
 
     expect(await content.checkPostsTagsTable()).toHaveLength(1);
   });
@@ -19,7 +27,14 @@ describe('testing posts', () => {
   test('createPost with no tags', async () => {
     expect(await content.getPosts('dummy', 0)).toHaveLength(1);
 
-    await content.createPost('dummy', 'post', 'url2');
+    const newPost = await content.createPost('dummy', 'post', 'url2');
+
+    expect(newPost).toMatchObject({
+      username: 'dummy',
+      name: 'dummy',
+      post: 'post',
+      url: 'url2'
+    });
 
     expect(await content.checkPostsTagsTable()).toHaveLength(1);
 

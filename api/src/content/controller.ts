@@ -25,10 +25,10 @@ export const createPost: RequestHandler = async (req, res) => {
   const url = shortid.generate().substr(0, 10);
   const { fixedPost, tags } = getTags(post);
 
-  (tags.length)
+  const newPost = (tags.length)
     ? await content.createPost(username, fixedPost, url, tags)
     : await content.createPost(username, fixedPost, url);
-  res.json({ message: 'Post created' });
+  res.json(newPost);
 };
 
 export const searchPosts: RequestHandler = async (req, res) => {
