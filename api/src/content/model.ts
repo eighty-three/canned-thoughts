@@ -76,7 +76,7 @@ export const getPost = async (
   url: string
 ): Promise<IPost | null> => {
   const query = new PS({ name: 'get-post', text: '\
-    SELECT post, url, p.date, tags FROM posts p \
+    SELECT post, url, tags, p.date, a.username, a.name FROM posts p \
     INNER JOIN accounts a on a.user_id = p.user_id \
     WHERE a.username=$1 AND p.url=$2'
   });
@@ -91,7 +91,7 @@ export const getPosts = async (
 ): Promise<IPost[] | null> => {
   // Returns posts in the range `offset` to `offset + 10` by account `username`
   const query = new PS({ name: 'get-posts', text: '\
-    SELECT post, url, p.date, tags FROM posts p \
+    SELECT post, url, tags, p.date, a.username, a.name FROM posts p \
     INNER JOIN accounts a ON a.user_id = p.user_id \
     WHERE a.username=$1 \
     ORDER BY p.date asc LIMIT 10 OFFSET $2'
@@ -184,7 +184,7 @@ export const searchPostsWithTags = async (
     if (options.followedOnly) {
       /* ============ FOLLOWED ============ */
       const query = new PS({ name: 'search-inclusive-followed', text: '\
-        SELECT post, url, p.date, tags FROM posts p \
+        SELECT post, url, tags, p.date, a.username, a.name FROM posts p \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
         INNER JOIN follows f ON f.user_id_follower = p.user_id \
         INNER JOIN accounts a ON a.user_id = f.user_id_follower \
@@ -198,7 +198,8 @@ export const searchPostsWithTags = async (
     } else {
       /* ============ ALL ============ */
       const query = new PS({ name: 'search-inclusive-all', text: '\
-        SELECT post, url, p.date, tags FROM posts p \
+        SELECT post, url, tags, p.date, a.username, a.name FROM posts p \
+        INNER JOIN accounts a ON a.user_id = p.user_id \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
         WHERE pt.tag_id && $1 \
         ORDER BY p.date asc LIMIT 10 OFFSET $2 \
@@ -215,7 +216,7 @@ export const searchPostsWithTags = async (
     if (options.followedOnly) {
       /* ============ FOLLOWED ============ */
       const query = new PS({ name: 'search-exclusive-followed', text: '\
-        SELECT post, url, p.date, tags FROM posts p \
+        SELECT post, url, tags, p.date, a.username, a.name FROM posts p \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
         INNER JOIN follows f ON f.user_id_follower = p.user_id \
         INNER JOIN accounts a ON a.user_id = f.user_id_follower \
@@ -229,7 +230,8 @@ export const searchPostsWithTags = async (
     } else {
       /* ============ ALL ============ */
       const query = new PS({ name: 'search-exclusive-all', text: '\
-        SELECT post, url, p.date, tags FROM posts p \
+        SELECT post, url, tags, p.date, a.username, a.name FROM posts p \
+        INNER JOIN accounts a ON a.user_id = p.user_id \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
         WHERE pt.tag_id = $1 \
         ORDER BY p.date asc LIMIT 10 OFFSET $2 \

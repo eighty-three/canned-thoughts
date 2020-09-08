@@ -28,6 +28,8 @@ describe('testing posts', () => {
 
   test('getPost with tags', async () => {
     expect(await content.getPost('dummy', 'url1')).toMatchObject({
+      username: 'dummy',
+      name: 'dummy',
       post: 'post',
       url: 'url1',
       tags: 'tag1|tag2|tag3'
@@ -36,6 +38,8 @@ describe('testing posts', () => {
 
   test('getPost with no tags', async () => {
     expect(await content.getPost('dummy', 'url2')).toMatchObject({
+      username: 'dummy',
+      name: 'dummy',
       post: 'post',
       url: 'url2',
       tags: null
@@ -64,6 +68,8 @@ describe('testing posts', () => {
   test('getPosts contains correct data', async () => {
     expect(await content.getPosts('dummy', 1)).toEqual(expect.arrayContaining([
       expect.objectContaining({
+        username: 'dummy',
+        name: 'dummy',
         post: 'post',
         url: 'url3',
         tags: null
@@ -72,6 +78,8 @@ describe('testing posts', () => {
 
     expect(await content.getPosts('dummy', 1)).not.toEqual(expect.arrayContaining([
       expect.objectContaining({
+        username: 'dummy',
+        name: 'dummy',
         post: 'post',
         url: 'url1',
         tags: 'tag1|tag2|tag3'

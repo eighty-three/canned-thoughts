@@ -412,6 +412,8 @@ describe('getPost', () => {
     const post = await agent.get(`${url}/getpost`).query(data);
 
     expect(post.body).toMatchObject({
+      username: 'dummy',
+      name: 'dummy',
       post: 'post',
       url: 'testurl',
       tags: null
