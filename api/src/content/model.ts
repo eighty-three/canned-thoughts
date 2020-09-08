@@ -105,7 +105,7 @@ export const getPosts = async (
     SELECT post, url, tags, p.date, a.username, a.name FROM posts p \
     INNER JOIN accounts a ON a.user_id = p.user_id \
     WHERE a.username=$1 \
-    ORDER BY p.date asc LIMIT 10 OFFSET $2'
+    ORDER BY p.date desc LIMIT 10 OFFSET $2'
   });
 
   query.values = [username, offset];
@@ -200,7 +200,7 @@ export const searchPostsWithTags = async (
         INNER JOIN follows f ON f.user_id_follower = p.user_id \
         INNER JOIN accounts a ON a.user_id = f.user_id_follower \
         WHERE pt.tag_id && $2 AND a.username = $1\
-        ORDER BY p.date asc LIMIT 10 OFFSET $3 \
+        ORDER BY p.date desc LIMIT 10 OFFSET $3 \
         ', values: [username, fixedIds, offset]
       });
 
@@ -213,7 +213,7 @@ export const searchPostsWithTags = async (
         INNER JOIN accounts a ON a.user_id = p.user_id \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
         WHERE pt.tag_id && $1 \
-        ORDER BY p.date asc LIMIT 10 OFFSET $2 \
+        ORDER BY p.date desc LIMIT 10 OFFSET $2 \
         ', values: [fixedIds, offset]
       });
 
@@ -232,7 +232,7 @@ export const searchPostsWithTags = async (
         INNER JOIN follows f ON f.user_id_follower = p.user_id \
         INNER JOIN accounts a ON a.user_id = f.user_id_follower \
         WHERE pt.tag_id = $2 AND a.username = $1\
-        ORDER BY p.date asc LIMIT 10 OFFSET $3 \
+        ORDER BY p.date desc LIMIT 10 OFFSET $3 \
         ', values: [username, fixedIds, offset]
       });
 
@@ -245,7 +245,7 @@ export const searchPostsWithTags = async (
         INNER JOIN accounts a ON a.user_id = p.user_id \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
         WHERE pt.tag_id = $1 \
-        ORDER BY p.date asc LIMIT 10 OFFSET $2 \
+        ORDER BY p.date desc LIMIT 10 OFFSET $2 \
         ', values: [fixedIds, offset]
       });
 
