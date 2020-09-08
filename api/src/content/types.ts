@@ -1,8 +1,10 @@
 export interface IPost {
+  username: string;
+  name: string;
   post: string;
   url: string;
   date: number;
-  tags: string;
+  tags?: string|null
 }
 
 export interface IRelation {
