@@ -11,5 +11,6 @@ export const getNameAndDescription = Joi.object({
 });
 
 export const getProfileInfo = Joi.object({
-  username: Joi.string().regex(/^[a-zA-Z0-9_]{1,29}$/).required()
+  profileUsername: Joi.string().regex(/^[a-zA-Z0-9_]{1,29}$/).required(),
+  loggedInUsername: Joi.string().regex(/^[a-zA-Z0-9_]{1,29}$/).optional()
 });
