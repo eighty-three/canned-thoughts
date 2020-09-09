@@ -2,13 +2,13 @@ import Joi from '@hapi/joi';
 
 export const createPost = Joi.object({
   username: Joi.string().regex(/^[a-zA-Z0-9_]{1,29}$/).required(),
-  post: Joi.string().regex(/^[a-zA-Z0-9 _$!@?#-]{1,250}$/).required()
+  post: Joi.string().regex(/^[\\/\[\]\(\) \n a-zA-Z0-9 _'":;~%^&*$!@?#,.-]{1,249}$/).required()
 });
 
 export const searchPosts = Joi.object({
   username: Joi.string().regex(/^[a-zA-Z0-9_]{1,29}$/).required(),
   tags: Joi.array().items(
-    Joi.string().regex(/^[a-zA-Z0-9 _$!@?#-]{1,20}$/).required()
+    Joi.string().regex(/^[a-zA-Z0-9_$!@?#-]{1,249}$/).required()
   ).required(),
   options: Joi.object({
     scope: Joi.string().valid('inclusive', 'exclusive').required(),
