@@ -30,6 +30,20 @@ describe('testing functions', () => {
     expect(profileInfo).toBe(null);
   });
 
+  test('getProfileInfo account exists, test with nonexistent account for followStatus', async () => {
+    const profileInfo = await profile.getProfileInfo('dummy1', 'dummy2');
+
+    expect(profileInfo).toMatchObject({
+      name: 'dummy1',
+      description: null,
+      followers: 0,
+      followStatus: false
+    });
+
+    expect(profileInfo?.date).toBeTruthy();
+    expect(profileInfo?.date).not.toBeFalsy();
+  });
+
   test('getNameAndDescription', async () => {
     expect(await profile.getNameAndDescription('dummy1')).toStrictEqual({
       name: 'dummy1',
