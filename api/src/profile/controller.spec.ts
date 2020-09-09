@@ -38,14 +38,6 @@ describe('function calls with authentication', () => {
   });
 
   describe('update', () => {
-    test('username doesnt exist', async () => {
-      const data = { username: 'dummy2', newName: 'dummy2', newDescription: 'hello' };
-      const message = await agent.post(`${url}/update`).send(data);
-
-      expect(message.body).toMatchObject({ error: 'Username not found' });
-      expect(message.status).toStrictEqual(401);
-    });
-
     test('username exists', async () => {
       const username = { username: 'dummy1' };
       let profileInfo = await agent.get(`${url}/getinfo`).query(username);
@@ -65,6 +57,21 @@ describe('function calls with authentication', () => {
       expect(profileInfo.body).toStrictEqual({ name: 'dummy2', description: 'hello' });
       expect(profileInfo.status).toStrictEqual(200);
     });
+
+    test('update profile with empty description', async () => {
+      const username = { username: 'dummy1' };
+      const data = { username: 'dummy1', newName: 'dummy2' };
+      const message = await agent.post(`${url}/update`).send(data);
+
+      expect(message.body).toMatchObject({ message: 'Profile successfully updated!' });
+      expect(message.status).toStrictEqual(200);
+
+      const profileInfo = await agent.get(`${url}/getinfo`).query(username);
+
+      expect(profileInfo.body).not.toStrictEqual({ name: 'dummy2', description: 'hello' });
+      expect(profileInfo.body).toStrictEqual({ name: 'dummy2', description: null });
+      expect(profileInfo.status).toStrictEqual(200);
+    });
   });
 });
 
@@ -81,14 +88,6 @@ describe('update', () => {
 
   test('rejected by validator, null data', async () => {
     const data = {};
-    const message = await agent.post(`${url}/update`).send(data);
-
-    expect(message.body).toMatchObject({ error: 'Bad Request' });
-    expect(message.status).toStrictEqual(400);
-  });
-
-  test('rejected by validator, incomplete fields', async () => {
-    const data = { username: 'dummy1', newName: 'dummy2' };
     const message = await agent.post(`${url}/update`).send(data);
 
     expect(message.body).toMatchObject({ error: 'Bad Request' });
