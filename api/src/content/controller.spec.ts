@@ -67,7 +67,7 @@ describe('function calls with authentication', () => {
   describe('searchPosts', () => {
     beforeAll(async () => {
       await createAccount('dummy2', '123');
-      await follows.followUser('dummy', 'dummy2');
+      await follows.toggleFollow('dummy', 'dummy2');
       for (let i = 0; i < 24; i++) {
         const username = (i % 2 === 0)
           ? 'dummy'

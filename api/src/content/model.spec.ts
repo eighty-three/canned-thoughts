@@ -179,7 +179,7 @@ describe('searchPosts', () => {
 
   describe('needs followUser', () => {
     beforeAll(async () => {
-      await follows.followUser('dummy', 'dummy2');
+      await follows.toggleFollow('dummy', 'dummy2');
     });
 
     test('searchPostsWithTags search-inclusive-followed', async () => {
