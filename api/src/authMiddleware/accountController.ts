@@ -56,19 +56,6 @@ export const replaceExistingUsername: RequestHandler = async (req, res, next) =>
   }
 };
 
-export const checkIfUsernameExists: RequestHandler = async (req, res, next) => {
-  const { username } = req.body;
-
-  const user = await account.checkUsername(username);
-  if (!user) {
-    res.status(401).json({error: 'Username not found'});
-    return;
-  }
-
-  next();
-  return;
-};
-
 export const checkIfUsernamesExist: RequestHandler = async (req, res, next) => {
   const usernames: string[] = [];
   for (const value of Object.values(req.body)) {
