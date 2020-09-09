@@ -2,7 +2,7 @@ import express from 'express';
 import validator from '@utils/validator';
 const router = express.Router();
 
-import { authToken, authAccount } from '@authMiddleware/index';
+import { authToken } from '@authMiddleware/index';
 
 import * as profile from './controller';
 import * as profileSchema from './schema';
@@ -11,7 +11,6 @@ import * as profileSchema from './schema';
 router.post('/update',
   validator(profileSchema.updateNameAndDescription, 'body'),
   authToken.verifyToken,
-  authAccount.checkIfUsernameExists,
   profile.updateNameAndDescription
 );
 
