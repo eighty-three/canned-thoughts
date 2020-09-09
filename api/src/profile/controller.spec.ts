@@ -199,7 +199,7 @@ describe('getall', () => {
   });
 
   test('rejected by validator, invalid value', async () => {
-    const data = { username: 'dummy$' };
+    const data = { profileUsername: 'dummy$' };
     const profileInfo = await agent.get(`${url}/getall`).query(data);
 
     expect(profileInfo.body).toMatchObject({ error: 'Bad Request' });
@@ -207,7 +207,7 @@ describe('getall', () => {
   });
 
   test('account doesnt exist', async () => {
-    const data = { username: 'dummy2' };
+    const data = { profileUsername: 'dummy2' };
     const profileInfo = await agent.get(`${url}/getall`).query(data);
 
     expect(profileInfo.body).toStrictEqual(null);
@@ -215,7 +215,7 @@ describe('getall', () => {
   });
 
   test('existing account', async () => {
-    const data = { username: 'dummy1' };
+    const data = { profileUsername: 'dummy1' };
     const profileInfo = await agent.get(`${url}/getall`).query(data);
 
     expect(profileInfo.body).toMatchObject({ 
