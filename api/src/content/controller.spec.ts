@@ -62,6 +62,23 @@ describe('function calls with authentication', () => {
 
       expect(await content.getPosts('dummy', 0)).toHaveLength(1);
     });
+
+    test('it works with tags', async () => {
+      const data = { username: 'dummy', post: 'testpost #tag1 #tag2' };
+      const post = await agent.post(`${url}/create`).send(data);
+
+      expect(post.body).toMatchObject({
+        username: 'dummy',
+        name: 'dummy',
+        post: 'testpost',
+        tags: 'tag1|tag2'
+      });
+
+      expect(post.status).toStrictEqual(200);
+
+      const deleteData = { username: 'dummy', url: post.body.url };
+      await agent.post(`${url}/delete`).send(deleteData);
+    });
   });
 
   describe('searchPosts', () => {
