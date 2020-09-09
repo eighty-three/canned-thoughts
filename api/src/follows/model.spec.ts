@@ -15,58 +15,38 @@ describe('testing functions', () => {
   });
 
   test('followUser', async () => {
-    expect(await profile.getProfileInfo('dummy2')).toEqual(
+    expect(await profile.getProfileInfo('dummy2', 'dummy1')).toEqual(
       expect.objectContaining({
-        followers: 0
+        followers: 0,
+        followStatus: false
       })
     );
     
-    await follows.followUser('dummy1', 'dummy2');
+    await follows.toggleFollow('dummy1', 'dummy2');
 
-    expect(await profile.getProfileInfo('dummy2')).toEqual(
+    expect(await profile.getProfileInfo('dummy2', 'dummy1')).toEqual(
       expect.objectContaining({
-        followers: 1
+        followers: 1,
+        followStatus: true
       })
     );
 
   });
 
   test('unfollowUser', async () => {
-    expect(await profile.getProfileInfo('dummy2')).toEqual(
+    expect(await profile.getProfileInfo('dummy2', 'dummy1')).toEqual(
       expect.objectContaining({
-        followers: 1
+        followers: 1,
+        followStatus: true
       })
     );
     
-    await follows.unfollowUser('dummy1', 'dummy2');
+    await follows.toggleFollow('dummy1', 'dummy2');
 
-    expect(await profile.getProfileInfo('dummy2')).toEqual(
+    expect(await profile.getProfileInfo('dummy2', 'dummy1')).toEqual(
       expect.objectContaining({
-        followers: 0
-      })
-    );
-  });
-
-  test('checkIfFollowed should fail', async () => {
-    expect(await follows.checkIfFollowed('dummy1', 'dummy2')).toStrictEqual(null);
-  });
-
-  test('checkIfFollowed should work', async () => {
-    expect(await follows.checkIfFollowed('dummy1', 'dummy2')).toStrictEqual(null);
-
-    expect(await profile.getProfileInfo('dummy2')).toEqual(
-      expect.objectContaining({
-        followers: 0
-      })
-    );
-
-    await follows.followUser('dummy1', 'dummy2');
-
-    expect(await follows.checkIfFollowed('dummy1', 'dummy2')).not.toBe(null);
-
-    expect(await profile.getProfileInfo('dummy2')).toEqual(
-      expect.objectContaining({
-        followers: 1
+        followers: 0,
+        followStatus: false
       })
     );
   });

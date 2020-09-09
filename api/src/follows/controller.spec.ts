@@ -6,6 +6,7 @@ const url = '/api/follows';
 
 import { createAccount } from '../account/model';
 import * as settings from '../settings/model';
+import * as profile from '../profile/model';
 
 console.log = function() {return;}; // Disable console.logs
 
@@ -60,87 +61,48 @@ describe('function calls with authentication', () => {
     });
     
     test('usernames exist', async () => {
+      expect(await profile.getProfileInfo('dummy2', 'dummy1')).toEqual(
+        expect.objectContaining({
+          followers: 0,
+          followStatus: false
+        })
+      );
+
       const data = { followerUsername: 'dummy1', followedUsername: 'dummy2' };
       const toggle = await agent.post(`${url}/toggle`).send(data);
     
-      expect(toggle.body).toMatchObject({ message: 'Followed' });
+      expect(toggle.body).toMatchObject({ message: 'Success' });
       expect(toggle.status).toStrictEqual(200);
-      
-      const dataForCheck = { followerUsername: 'dummy1', followedUsername: 'dummy2' };
-      const check = await agent.get(`${url}/check`).query(dataForCheck);
 
-      expect(check.body).toStrictEqual(true);
-      expect(check.status).toStrictEqual(200);
+      expect(await profile.getProfileInfo('dummy2', 'dummy1')).toEqual(
+        expect.objectContaining({
+          followers: 1,
+          followStatus: true
+        })
+      );
+
     });
 
     test('usernames exist, toggle again', async () => {
+      expect(await profile.getProfileInfo('dummy2', 'dummy1')).toEqual(
+        expect.objectContaining({
+          followers: 1,
+          followStatus: true
+        })
+      );
       const data = { followerUsername: 'dummy1', followedUsername: 'dummy2' };
       const toggle = await agent.post(`${url}/toggle`).send(data);
     
-      expect(toggle.body).not.toMatchObject({ message: 'Followed' });
-      expect(toggle.body).toMatchObject({ message: 'Unfollowed' });
+      expect(toggle.body).toMatchObject({ message: 'Success' });
       expect(toggle.status).toStrictEqual(200);
+
+      expect(await profile.getProfileInfo('dummy2', 'dummy1')).toEqual(
+        expect.objectContaining({
+          followers: 0,
+          followStatus: false
+        })
+      );
     });
-  });
-});
-
-describe('check', () => {
-  test('rejected by validator, null request', async () => {
-    const agent = request(server);
-    const data = {};
-    const check = await agent.get(`${url}/check`).query(data);
-
-    expect(check.body).toMatchObject({ error: 'Bad Request' });
-    expect(check.status).toStrictEqual(400);
-  });
-
-  test('rejected by validator, incomplete fields', async () => {
-    const agent = request(server);
-    const data = { followedUsername: 'dummy2' };
-    const check = await agent.get(`${url}/check`).query(data);
-
-    expect(check.body).toMatchObject({ error: 'Bad Request' });
-    expect(check.status).toStrictEqual(400);
-  });
-
-  test('rejected by validator, invalid values', async () => {
-    const agent = request(server);
-    const data = { followerUsername: 'dummy1$', followedUsername: 'dummy2' };
-    const check = await agent.get(`${url}/check`).query(data);
-
-    expect(check.body).toMatchObject({ error: 'Bad Request' });
-    expect(check.status).toStrictEqual(400);
-  });
-
-  test('check with two fake accounts', async () => {
-    const agent = request(server);
-    const data = { followerUsername: 'dummy1', followedUsername: 'dummy2' };
-    const check = await agent.get(`${url}/check`).query(data);
-
-    expect(check.body).toStrictEqual(false);
-    expect(check.status).toStrictEqual(200);
-  });
-
-  test('check with one fake one real', async () => {
-    await createAccount('dummy1', '123');
-
-    const agent = request(server);
-    const data = { followerUsername: 'dummy1', followedUsername: 'dummy2' };
-    const check = await agent.get(`${url}/check`).query(data);
-
-    expect(check.body).toStrictEqual(false);
-    expect(check.status).toStrictEqual(200);
-  });
-
-  test('check with two real accounts', async () => {
-    await createAccount('dummy2', '123');
-
-    const agent = request(server);
-    const data = { followerUsername: 'dummy1', followedUsername: 'dummy2' };
-    const check = await agent.get(`${url}/check`).query(data);
-
-    expect(check.body).toStrictEqual(false);
-    expect(check.status).toStrictEqual(200);
   });
 });
 
