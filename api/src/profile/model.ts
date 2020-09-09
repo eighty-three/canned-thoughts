@@ -11,14 +11,41 @@ interface IProfileInfo {
 type INameAndDescription = Omit<IProfileInfo, 'followers'|'date'>;
 
 export const getProfileInfo = async (
-  username: string
+  profileUsername: string,
+  loggedInUsername?: string
 ): Promise<IProfileInfo | null> => {
   const query = new PS({ name: 'get-profile-info', text: '\
     SELECT name, description, followers, date FROM accounts WHERE username=$1'
   });
+  query.values = [profileUsername];
 
-  query.values = [username];
-  return await db.oneOrNone(query);
+  if (loggedInUsername) {
+    // If user is logged in, check the follow status
+    return await db.task(async t => {
+      const checkPS = new PS({ name: 'check-follow-status', text: '\
+        SELECT user_id_followed from follows f \
+        INNER JOIN accounts a1 ON a1.user_id = user_id_follower \
+        INNER JOIN accounts a2 ON a2.user_id = user_id_followed \
+        WHERE a1.username=$1 AND a2.username=$2'
+      });
+      checkPS.values = [loggedInUsername, profileUsername];
+
+      const followed = await t.oneOrNone(checkPS);
+      const followStatus = (followed) 
+      /* If a user_id is returned, it means 
+       * the user follows the visited profile
+       */
+        ? true
+        : false;
+
+      const profileInfo = await t.oneOrNone(query);
+      // Return both profile info and follow status
+      return {...profileInfo, followStatus};
+    });
+  } else {
+    // Else if user is not logged in, return profile info normally
+    return await db.oneOrNone(query);
+  }
 };
 
 export const getNameAndDescription = async (
