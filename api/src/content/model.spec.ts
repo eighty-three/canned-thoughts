@@ -16,7 +16,7 @@ describe('testing posts', () => {
     expect(newPost).toMatchObject({
       username: 'dummy',
       name: 'dummy',
-      tags: 'tag1|tag2|tag3',
+      tags, // same as input instead of having to do any string manipulation
       post: 'post',
       url: 'url1'
     });
@@ -42,12 +42,14 @@ describe('testing posts', () => {
   });
 
   test('getPost with tags', async () => {
+    const tags = ['tag1', 'tag2', 'tag3'];
+
     expect(await content.getPost('dummy', 'url1')).toMatchObject({
       username: 'dummy',
       name: 'dummy',
       post: 'post',
       url: 'url1',
-      tags: 'tag1|tag2|tag3'
+      tags // same as input instead of having to do any string manipulation
     });
   });
 
@@ -152,12 +154,12 @@ describe('searchPosts', () => {
       followedOnly: false
     };
 
-    expect(await content.searchPostsWithTags('dummy', tags, options, 0)).toHaveLength(10);
-    expect(await content.searchPostsWithTags('dummy', tags, options, 5)).toHaveLength(10);
+    expect(await content.searchPostsWithTags('dummy', tags, options, 0)).toHaveLength(11);
+    expect(await content.searchPostsWithTags('dummy', tags, options, 5)).toHaveLength(11);
     expect(await content.searchPostsWithTags('dummy', tags, options, 11)).toHaveLength(9);
 
-    expect(await content.searchPostsWithTags('dummy', ['test_tag'], options, 0)).toHaveLength(10);
-    expect(await content.searchPostsWithTags('dummy', ['new_tag'], options, 0)).toHaveLength(10);
+    expect(await content.searchPostsWithTags('dummy', ['test_tag'], options, 0)).toHaveLength(11);
+    expect(await content.searchPostsWithTags('dummy', ['new_tag'], options, 0)).toHaveLength(11);
     expect(await content.searchPostsWithTags('dummy', ['new_tag'], options, 11)).toHaveLength(9);
   });
 
@@ -170,7 +172,7 @@ describe('searchPosts', () => {
       followedOnly: false
     };
 
-    expect(await content.searchPostsWithTags('dummy', tags, options, 0)).toHaveLength(10);
+    expect(await content.searchPostsWithTags('dummy', tags, options, 0)).toHaveLength(11);
     expect(await content.searchPostsWithTags('dummy', tags, options, 18)).toHaveLength(2);
 
     expect(await content.searchPostsWithTags('dummy', ['test_tag'], options, 0)).toHaveLength(0);

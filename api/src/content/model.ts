@@ -38,14 +38,8 @@ export const createPost = async (
     });
 
     const mappedTags = tag_ids.map((tag) => Number(tag.tag_id));
+    // Getting the tag IDs is necessary to create the posts tags relation properly
 
-    /* From [ 'tag1', 'tag2', 'tag3' ] as an array
-     * to 'tag1|tag2|tag3' as a string
-     * since the | character won't be allowed in the form
-     * so when getting the post data, I can easily transform it
-     * with a split call using the | character
-     */
-    const fixedTags = `${tags.join('|')}`;
     const createPost = new PS({ name: 'create-post-with-tags', text: '\
       WITH ins (user_id, post_id, post, url, tags, date) AS ( \
         INSERT INTO posts (user_id, post, url, tags) \
@@ -55,7 +49,7 @@ export const createPost = async (
       SELECT post_id, post, url, tags, ins.date, a.username, a.name FROM ins \
       INNER JOIN accounts a on a.user_id = ins.user_id'
     });
-    createPost.values = [username, post, url, fixedTags];
+    createPost.values = [username, post, url, tags];
 
     return await db.task(async t => {
       const postRow = await t.one(createPost);
@@ -105,7 +99,7 @@ export const getPosts = async (
     SELECT post, url, tags, p.date, a.username, a.name FROM posts p \
     INNER JOIN accounts a ON a.user_id = p.user_id \
     WHERE a.username=$1 \
-    ORDER BY p.date desc LIMIT 10 OFFSET $2'
+    ORDER BY p.date desc LIMIT 11 OFFSET $2'
   });
 
   query.values = [username, offset];
@@ -200,7 +194,7 @@ export const searchPostsWithTags = async (
         INNER JOIN follows f ON f.user_id_follower = p.user_id \
         INNER JOIN accounts a ON a.user_id = f.user_id_follower \
         WHERE pt.tag_id && $2 AND a.username = $1\
-        ORDER BY p.date desc LIMIT 10 OFFSET $3 \
+        ORDER BY p.date desc LIMIT 11 OFFSET $3 \
         ', values: [username, fixedIds, offset]
       });
 
@@ -213,7 +207,7 @@ export const searchPostsWithTags = async (
         INNER JOIN accounts a ON a.user_id = p.user_id \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
         WHERE pt.tag_id && $1 \
-        ORDER BY p.date desc LIMIT 10 OFFSET $2 \
+        ORDER BY p.date desc LIMIT 11 OFFSET $2 \
         ', values: [fixedIds, offset]
       });
 
@@ -232,7 +226,7 @@ export const searchPostsWithTags = async (
         INNER JOIN follows f ON f.user_id_follower = p.user_id \
         INNER JOIN accounts a ON a.user_id = f.user_id_follower \
         WHERE pt.tag_id = $2 AND a.username = $1\
-        ORDER BY p.date desc LIMIT 10 OFFSET $3 \
+        ORDER BY p.date desc LIMIT 11 OFFSET $3 \
         ', values: [username, fixedIds, offset]
       });
 
@@ -245,7 +239,7 @@ export const searchPostsWithTags = async (
         INNER JOIN accounts a ON a.user_id = p.user_id \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
         WHERE pt.tag_id = $1 \
-        ORDER BY p.date desc LIMIT 10 OFFSET $2 \
+        ORDER BY p.date desc LIMIT 11 OFFSET $2 \
         ', values: [fixedIds, offset]
       });
 
