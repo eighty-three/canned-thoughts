@@ -210,8 +210,8 @@ describe('getall', () => {
     const data = { profileUsername: 'dummy2' };
     const profileInfo = await agent.get(`${url}/getall`).query(data);
 
-    expect(profileInfo.body).toStrictEqual(null);
-    expect(profileInfo.status).toStrictEqual(200);
+    expect(profileInfo.body).toStrictEqual({ error: 'Username not found' });
+    expect(profileInfo.status).toStrictEqual(401);
   });
 
   test('existing account', async () => {
