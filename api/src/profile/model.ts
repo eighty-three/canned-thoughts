@@ -15,7 +15,7 @@ export const getProfileInfo = async (
   loggedInUsername?: string
 ): Promise<IProfileInfo | null> => {
   const query = new PS({ name: 'get-profile-info', text: '\
-    SELECT name, description, followers, date FROM accounts WHERE username=$1'
+    SELECT username, name, description, followers, date FROM accounts WHERE username=$1'
   });
   query.values = [profileUsername];
 
