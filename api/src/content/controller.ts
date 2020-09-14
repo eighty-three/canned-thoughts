@@ -2,32 +2,13 @@ import { RequestHandler } from 'express';
 import shortid from 'shortid';
 import * as content from './model';
 
-export const getTags = (post: string): { fixedPost: string, tags: string[] } => {
-  const arr = post.split('#');
-  const num = (arr.length - 3 > 0)
-    ? arr.length - 3
-    : 1;
-  const tags = [];
-  const toFilter = arr.splice(num);
-
-  for (let i = 0; i < toFilter.length; i++) {
-    const str = toFilter[i].trim(); // Remove whitespace
-    if (str) tags.push(str);
-  }
-
-  const fixedPost = arr.join('#').trim();
-
-  return { fixedPost, tags };
-};
-
 export const createPost: RequestHandler = async (req, res) => {
-  const { username, post } = req.body;
+  const { username, post, tags } = req.body;
   const url = shortid.generate().substr(0, 10);
-  const { fixedPost, tags } = getTags(post);
 
-  const newPost = (tags.length)
-    ? await content.createPost(username, fixedPost, url, tags)
-    : await content.createPost(username, fixedPost, url);
+  const newPost = (tags)
+    ? await content.createPost(username, post, url, tags)
+    : await content.createPost(username, post, url);
   res.json(newPost);
 };
 
