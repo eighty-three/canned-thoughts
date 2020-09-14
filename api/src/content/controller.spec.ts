@@ -8,7 +8,6 @@ import { createAccount } from '../account/model';
 import * as settings from '../settings/model';
 import * as follows from '../follows/model';
 import * as content from './model';
-import { getTags } from './controller';
 
 console.log = function() {return;}; // Disable console.logs
 
@@ -64,14 +63,14 @@ describe('function calls with authentication', () => {
     });
 
     test('it works with tags', async () => {
-      const data = { username: 'dummy', post: 'testpost #tag1 #tag2' };
+      const data = { username: 'dummy', post: 'testpost', tags: ['tag1', 'tag2'] };
       const post = await agent.post(`${url}/create`).send(data);
 
       expect(post.body).toMatchObject({
         username: 'dummy',
         name: 'dummy',
         post: 'testpost',
-        tags: 'tag1|tag2'
+        tags: ['tag1', 'tag2']
       });
 
       expect(post.status).toStrictEqual(200);
@@ -104,18 +103,18 @@ describe('function calls with authentication', () => {
         const data = { username: 'dummy', tags: ['tag1'], options, page: 1 };
         let posts = await agent.post(`${url}/search`).send(data);
 
-        expect(posts.body).toHaveLength(10);
+        expect(posts.body).toHaveLength(11);
         expect(posts.status).toStrictEqual(200);
 
         expect(posts.body).toEqual(
           expect.arrayContaining(
-            [expect.objectContaining({ tags: 'tag1' })]
+            [expect.objectContaining({ tags: ['tag1'] })]
           )
         );
 
         expect(posts.body).not.toEqual(
           expect.arrayContaining(
-            [expect.objectContaining({ tags: 'tag1|tag2|tag3' })]
+            [expect.objectContaining({ tags: ['tag1', 'tag2', 'tag3'] })]
           )
         );
 
@@ -136,18 +135,18 @@ describe('function calls with authentication', () => {
         const data = { username: 'dummy', tags: ['tag1', 'tag2', 'tag3'], options, page: 1 };
         let posts = await agent.post(`${url}/search`).send(data);
 
-        expect(posts.body).toHaveLength(10);
+        expect(posts.body).toHaveLength(11);
         expect(posts.status).toStrictEqual(200);
 
         expect(posts.body).toEqual(
           expect.arrayContaining(
-            [expect.objectContaining({ tags: 'tag1|tag2|tag3' })]
+            [expect.objectContaining({ tags: ['tag1', 'tag2', 'tag3'] })]
           )
         );
 
         expect(posts.body).not.toEqual(
           expect.arrayContaining(
-            [expect.objectContaining({ tags: 'tag1' })]
+            [expect.objectContaining({ tags: ['tag1'] })]
           )
         );
 
@@ -174,13 +173,13 @@ describe('function calls with authentication', () => {
 
         expect(posts.body).toEqual(
           expect.arrayContaining(
-            [expect.objectContaining({ tags: 'tag1' })]
+            [expect.objectContaining({ tags: ['tag1'] })]
           )
         );
 
         expect(posts.body).not.toEqual(
           expect.arrayContaining(
-            [expect.objectContaining({ tags: 'tag1|tag2|tag3' })]
+            [expect.objectContaining({ tags: ['tag1', 'tag2', 'tag3'] })]
           )
         );
 
@@ -207,13 +206,13 @@ describe('function calls with authentication', () => {
 
         expect(posts.body).toEqual(
           expect.arrayContaining(
-            [expect.objectContaining({ tags: 'tag1|tag2|tag3' })]
+            [expect.objectContaining({ tags: ['tag1', 'tag2', 'tag3'] })]
           )
         );
 
         expect(posts.body).not.toEqual(
           expect.arrayContaining(
-            [expect.objectContaining({ tags: 'tag1' })]
+            [expect.objectContaining({ tags: ['tag1'] })]
           )
         );
 
@@ -238,7 +237,7 @@ describe('function calls with authentication', () => {
         const data = { username: 'dummy', tags: ['tag1'], options, page: 1 };
         let posts = await agent.post(`${url}/search`).send(data);
 
-        expect(posts.body).toHaveLength(10);
+        expect(posts.body).toHaveLength(11);
         expect(posts.status).toStrictEqual(200);
 
         data.page = 2;
@@ -247,13 +246,13 @@ describe('function calls with authentication', () => {
         expect(posts.body).toEqual( // Page 2 because page 1 consists solely of "all tags"
           expect.arrayContaining(
             [
-              expect.objectContaining({ tags: 'tag1|tag2|tag3' }),
-              expect.objectContaining({ tags: 'tag1' })
+              expect.objectContaining({ tags: ['tag1'] }),
+              expect.objectContaining({ tags: ['tag1', 'tag2', 'tag3'] })
             ]
           )
         );
 
-        expect(posts.body).toHaveLength(10);
+        expect(posts.body).toHaveLength(11);
         expect(posts.status).toStrictEqual(200);
 
         data.page = 3;
@@ -267,7 +266,7 @@ describe('function calls with authentication', () => {
         const data = { username: 'dummy', tags: ['tag1', 'tag2', 'tag3'], options, page: 1 };
         let posts = await agent.post(`${url}/search`).send(data);
 
-        expect(posts.body).toHaveLength(10);
+        expect(posts.body).toHaveLength(11);
         expect(posts.status).toStrictEqual(200);
 
         data.page = 2;
@@ -276,13 +275,13 @@ describe('function calls with authentication', () => {
         expect(posts.body).toEqual( // Page 2 because page 1 consists solely of "all tags"
           expect.arrayContaining(
             [
-              expect.objectContaining({ tags: 'tag1|tag2|tag3' }),
-              expect.objectContaining({ tags: 'tag1' })
+              expect.objectContaining({ tags: ['tag1'] }),
+              expect.objectContaining({ tags: ['tag1', 'tag2', 'tag3'] })
             ]
           )
         );
 
-        expect(posts.body).toHaveLength(10);
+        expect(posts.body).toHaveLength(11);
         expect(posts.status).toStrictEqual(200);
 
         data.page = 3;
@@ -297,14 +296,14 @@ describe('function calls with authentication', () => {
         const data = { username: 'dummy', tags: ['tag1'], options, page: 1 };
         let posts = await agent.post(`${url}/search`).send(data);
 
-        expect(posts.body).toHaveLength(10);
+        expect(posts.body).toHaveLength(11);
         expect(posts.status).toStrictEqual(200);
 
         expect(posts.body).toEqual(
           expect.arrayContaining(
             [
-              expect.objectContaining({ tags: 'tag1|tag2|tag3' }),
-              expect.objectContaining({ tags: 'tag1' })
+              expect.objectContaining({ tags: ['tag1'] }),
+              expect.objectContaining({ tags: ['tag1', 'tag2', 'tag3'] })
             ]
           )
         );
@@ -327,14 +326,14 @@ describe('function calls with authentication', () => {
         const data = { username: 'dummy', tags: ['tag1', 'tag2', 'tag3'], options, page: 1 };
         let posts = await agent.post(`${url}/search`).send(data);
 
-        expect(posts.body).toHaveLength(10);
+        expect(posts.body).toHaveLength(11);
         expect(posts.status).toStrictEqual(200);
 
         expect(posts.body).toEqual(
           expect.arrayContaining(
             [
-              expect.objectContaining({ tags: 'tag1|tag2|tag3' }),
-              expect.objectContaining({ tags: 'tag1' })
+              expect.objectContaining({ tags: ['tag1'] }),
+              expect.objectContaining({ tags: ['tag1', 'tag2', 'tag3'] })
             ]
           )
         );
@@ -505,7 +504,7 @@ describe('getPosts', () => {
     const data = { username: 'dummy', page: 1 };
     const posts = await agent.get(`${url}/getallposts`).query(data);
 
-    expect(posts.body).toHaveLength(10);
+    expect(posts.body).toHaveLength(11);
     expect(posts.status).toStrictEqual(200);
   });
 
@@ -658,38 +657,5 @@ describe('searchPosts', () => {
 
     expect(posts.body).toMatchObject({error: 'You are not authenticated'});
     expect(posts.status).toStrictEqual(401);
-  });
-});
-
-describe('getTags', () => {
-  test('empty input', () => {
-    const input = 'test';
-    expect(getTags(input)).toStrictEqual({ fixedPost: 'test', tags: [] });
-  });
-
-  test('one tag', () => {
-    const input = 'test #tag';
-    expect(getTags(input)).toStrictEqual({ fixedPost: 'test', tags: ['tag'] });
-  });
-
-  test('one tag, whitespace', () => {
-    const input = 'test #tag  1          ';
-    expect(getTags(input)).toStrictEqual({ fixedPost: 'test', tags: ['tag  1'] });
-  });
-
-  test('three tags', () => {
-    const input = 'test #tag1 #tag2 #tag3';
-    expect(getTags(input)).toStrictEqual({ fixedPost: 'test', tags: ['tag1', 'tag2', 'tag3'] });
-  });
-
-  test('more than three tags, whitespace', () => {
-    const input = 'test #tag1 #tag2 #tag3 #tag4 space #     ';
-    expect(getTags(input))
-      .toStrictEqual(
-        { 
-          fixedPost: 'test #tag1 #tag2', 
-          tags: ['tag3', 'tag4 space'] 
-        }
-      ); // Tag 5 is discarded because it's null
   });
 });
