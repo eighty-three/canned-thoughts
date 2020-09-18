@@ -13,6 +13,6 @@ export interface IRelation {
 }
 
 export interface IOptions {
-  scope: 'inclusive' | 'exclusive';
-  followedOnly: boolean;
+  tagScope: 'inclusive' | 'exclusive';
+  userScope: 'all' | 'followed';
 }

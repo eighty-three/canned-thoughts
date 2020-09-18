@@ -10,12 +10,12 @@ export const createPost = Joi.object({
 
 export const searchPosts = Joi.object({
   username: Joi.string().regex(/^[a-zA-Z0-9_]{1,29}$/).required(),
-  tags: Joi.array().items(
+  tags: Joi.array().max(3).items(
     Joi.string().regex(/^[a-zA-Z0-9]{1,99}$/).required()
   ).required(),
   options: Joi.object({
-    scope: Joi.string().valid('inclusive', 'exclusive').required(),
-    followedOnly: Joi.bool().required()
+    userScope: Joi.string().valid('all', 'followed').required(),
+    tagScope: Joi.string().valid('inclusive', 'exclusive').required()
   }).required(),
   page: Joi.number().integer().min(0).max(99999).required()
 });

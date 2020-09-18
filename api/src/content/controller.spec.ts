@@ -97,9 +97,9 @@ describe('function calls with authentication', () => {
     });
 
     describe('search exclusive', () => {
-      const options = { scope: 'exclusive', followedOnly: false };
-
       test('search exclusive all, one tag', async () => {
+        const options = { userScope: 'all', tagScope: 'exclusive' };
+
         const data = { username: 'dummy', tags: ['tag1'], options, page: 1 };
         let posts = await agent.post(`${url}/search`).send(data);
 
@@ -132,6 +132,8 @@ describe('function calls with authentication', () => {
       });
 
       test('search exclusive all, all tags', async () => {
+        const options = { userScope: 'all', tagScope: 'exclusive' };
+
         const data = { username: 'dummy', tags: ['tag1', 'tag2', 'tag3'], options, page: 1 };
         let posts = await agent.post(`${url}/search`).send(data);
 
@@ -164,7 +166,8 @@ describe('function calls with authentication', () => {
       });
 
       test('search exclusive followed only, one tag', async () => {
-        options.followedOnly = true;
+        const options = { userScope: 'followed', tagScope: 'exclusive' };
+
         const data = { username: 'dummy', tags: ['tag1'], options, page: 1 };
         let posts = await agent.post(`${url}/search`).send(data);
 
@@ -197,7 +200,8 @@ describe('function calls with authentication', () => {
       });
 
       test('search exclusive followed only, all tags', async () => {
-        options.followedOnly = true;
+        const options = { userScope: 'followed', tagScope: 'exclusive' };
+
         const data = { username: 'dummy', tags: ['tag1', 'tag2', 'tag3'], options, page: 1 };
         let posts = await agent.post(`${url}/search`).send(data);
 
@@ -231,9 +235,9 @@ describe('function calls with authentication', () => {
     });
 
     describe('search inclusive', () => {
-      const options = { scope: 'inclusive', followedOnly: false };
-
       test('search inclusive all, one tag', async () => {
+        const options = { userScope: 'all', tagScope: 'inclusive' };
+
         const data = { username: 'dummy', tags: ['tag1'], options, page: 1 };
         let posts = await agent.post(`${url}/search`).send(data);
 
@@ -263,6 +267,8 @@ describe('function calls with authentication', () => {
       });
 
       test('search inclusive all, all tags', async () => {
+        const options = { userScope: 'all', tagScope: 'inclusive' };
+
         const data = { username: 'dummy', tags: ['tag1', 'tag2', 'tag3'], options, page: 1 };
         let posts = await agent.post(`${url}/search`).send(data);
 
@@ -292,7 +298,8 @@ describe('function calls with authentication', () => {
       });
 
       test('search inclusive followed only, one tag', async () => {
-        options.followedOnly = true;
+        const options = { userScope: 'followed', tagScope: 'inclusive' };
+
         const data = { username: 'dummy', tags: ['tag1'], options, page: 1 };
         let posts = await agent.post(`${url}/search`).send(data);
 
@@ -322,7 +329,8 @@ describe('function calls with authentication', () => {
       });
 
       test('search inclusive followed only, all tags', async () => {
-        options.followedOnly = true;
+        const options = { userScope: 'followed', tagScope: 'inclusive' };
+
         const data = { username: 'dummy', tags: ['tag1', 'tag2', 'tag3'], options, page: 1 };
         let posts = await agent.post(`${url}/search`).send(data);
 
@@ -648,8 +656,8 @@ describe('searchPosts', () => {
 
   test('valid request, no authentication', async () => {
     const options = {
-      scope: 'inclusive',
-      followedOnly: true
+      userScope: 'followed',
+      tagScope: 'inclusive'
     };
 
     const data = { username: 'dummy', tags, options, page: 2 };

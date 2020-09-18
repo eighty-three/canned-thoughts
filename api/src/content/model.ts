@@ -183,10 +183,10 @@ export const searchPostsWithTags = async (
    *    'x' only, or 'y' only, or 'x' and 'y' only
    * Followed means it returns posts from people you follow
    * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-  if (options.scope === 'inclusive') {
+  if (options.tagScope === 'inclusive') {
   /* ==============================INCLUSIVE ============================== */
 
-    if (options.followedOnly) {
+    if (options.userScope === 'followed') {
       /* ============ FOLLOWED ============ */
       const query = new PS({ name: 'search-inclusive-followed', text: '\
         SELECT post, url, tags, p.date, a.username, a.name FROM posts p \
@@ -218,7 +218,7 @@ export const searchPostsWithTags = async (
   } else {
   /* ============================== EXCLUSIVE ============================== */
 
-    if (options.followedOnly) {
+    if (options.userScope === 'followed') {
       /* ============ FOLLOWED ============ */
       const query = new PS({ name: 'search-exclusive-followed', text: '\
         SELECT post, url, tags, p.date, a.username, a.name FROM posts p \

@@ -150,8 +150,8 @@ describe('searchPosts', () => {
     expect(await content.getTag('new_tag')).toStrictEqual({ tag_id: 10 });
 
     const options: IOptions = {
-      scope: 'inclusive',
-      followedOnly: false
+      userScope: 'all',
+      tagScope: 'inclusive'
     };
 
     expect(await content.searchPostsWithTags('dummy', tags, options, 0)).toHaveLength(11);
@@ -168,8 +168,8 @@ describe('searchPosts', () => {
     expect(await content.getTag('new_tag')).toStrictEqual({ tag_id: 10 });
 
     const options: IOptions = {
-      scope: 'exclusive',
-      followedOnly: false
+      userScope: 'all',
+      tagScope: 'exclusive'
     };
 
     expect(await content.searchPostsWithTags('dummy', tags, options, 0)).toHaveLength(11);
@@ -186,8 +186,8 @@ describe('searchPosts', () => {
 
     test('searchPostsWithTags search-inclusive-followed', async () => {
       const options: IOptions = {
-        scope: 'inclusive',
-        followedOnly: true
+        userScope: 'followed',
+        tagScope: 'inclusive'
       };
     
       expect(await content.searchPostsWithTags('dummy', tags, options, 0)).toHaveLength(10);
@@ -202,8 +202,8 @@ describe('searchPosts', () => {
     
     test('searchPostsWithTags search-exclusive-followed', async () => {
       const options: IOptions = {
-        scope: 'exclusive',
-        followedOnly: true
+        userScope: 'followed',
+        tagScope: 'exclusive'
       };
     
       expect(await content.searchPostsWithTags('dummy', tags, options, 0)).toHaveLength(10);
