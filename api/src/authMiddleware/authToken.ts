@@ -28,11 +28,12 @@ export const verifyToken: RequestHandler = async (req, res, next) => {
       if (!user) {
         res.status(401).json({error: 'You are not authenticated'});
         return;
+      } else {
+        next();
+        return;
       }
     }
   });
-  next();
-  return;
 };
 
 export const verifyExistingToken: RequestHandler = async (req, res, next) => {
