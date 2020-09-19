@@ -24,7 +24,13 @@
     ],
     "ignorePatterns": ["server/src/utils"],
     "rules": {
-        "indent": ["error", 2, {"SwitchCase": 1 }],
+        "indent": [
+          "error", 2, {
+            "SwitchCase": 1,
+            "ignoredNodes": ["TemplateLiteral"]
+          }
+        ],
+
         "linebreak-style": [
             "error",
             "unix"
