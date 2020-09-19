@@ -14,5 +14,5 @@ export interface IRelation {
 
 export interface IOptions {
   tagScope: 'inclusive' | 'exclusive';
-  userScope: 'all' | 'followed';
+  userScope: 'all' | 'followed' | 'self';
 }

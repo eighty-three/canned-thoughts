@@ -163,6 +163,24 @@ describe('searchPosts', () => {
     expect(await content.searchPostsWithTags('dummy', ['new_tag'], options, 11)).toHaveLength(9);
   });
 
+  test('searchPostsWithTags search-inclusive-self', async () => {
+    expect(await content.getTag('test_tag')).toStrictEqual({ tag_id: 9 });
+    expect(await content.getTag('new_tag')).toStrictEqual({ tag_id: 10 });
+
+    const options: IOptions = {
+      userScope: 'self',
+      tagScope: 'inclusive'
+    };
+
+    expect(await content.searchPostsWithTags('dummy', tags, options, 0)).toHaveLength(10);
+    expect(await content.searchPostsWithTags('dummy', tags, options, 5)).toHaveLength(5);
+    expect(await content.searchPostsWithTags('dummy', tags, options, 11)).toHaveLength(0);
+
+    expect(await content.searchPostsWithTags('dummy', ['test_tag'], options, 0)).toHaveLength(10);
+    expect(await content.searchPostsWithTags('dummy', ['new_tag'], options, 0)).toHaveLength(10);
+    expect(await content.searchPostsWithTags('dummy', ['new_tag'], options, 11)).toHaveLength(0);
+  });
+
   test('searchPostsWithTags search-exclusive-all', async () => {
     expect(await content.getTag('test_tag')).toStrictEqual({ tag_id: 9 });
     expect(await content.getTag('new_tag')).toStrictEqual({ tag_id: 10 });
@@ -174,6 +192,22 @@ describe('searchPosts', () => {
 
     expect(await content.searchPostsWithTags('dummy', tags, options, 0)).toHaveLength(11);
     expect(await content.searchPostsWithTags('dummy', tags, options, 18)).toHaveLength(2);
+
+    expect(await content.searchPostsWithTags('dummy', ['test_tag'], options, 0)).toHaveLength(0);
+    expect(await content.searchPostsWithTags('dummy', ['new_tag'], options, 0)).toHaveLength(0);
+  });
+
+  test('searchPostsWithTags search-exclusive-self', async () => {
+    expect(await content.getTag('test_tag')).toStrictEqual({ tag_id: 9 });
+    expect(await content.getTag('new_tag')).toStrictEqual({ tag_id: 10 });
+
+    const options: IOptions = {
+      userScope: 'self',
+      tagScope: 'exclusive'
+    };
+
+    expect(await content.searchPostsWithTags('dummy', tags, options, 0)).toHaveLength(10);
+    expect(await content.searchPostsWithTags('dummy', tags, options, 18)).toHaveLength(0);
 
     expect(await content.searchPostsWithTags('dummy', ['test_tag'], options, 0)).toHaveLength(0);
     expect(await content.searchPostsWithTags('dummy', ['new_tag'], options, 0)).toHaveLength(0);
@@ -212,6 +246,62 @@ describe('searchPosts', () => {
     
       expect(await content.searchPostsWithTags('dummy', ['test_tag'], options, 0)).toHaveLength(0);
       expect(await content.searchPostsWithTags('dummy', ['new_tag'], options, 0)).toHaveLength(0);
+    });
+  });
+  
+  describe('tags dont exist', () => {
+    test('searchPostsWithTags search-inclusive-all', async () => {
+      const options: IOptions = {
+        userScope: 'all',
+        tagScope: 'inclusive'
+      };
+    
+      expect(await content.searchPostsWithTags('dummy', ['no_tag'], options, 0)).toHaveLength(0);
+    });
+
+    test('searchPostsWithTags search-inclusive-followed', async () => {
+      const options: IOptions = {
+        userScope: 'followed',
+        tagScope: 'inclusive'
+      };
+    
+      expect(await content.searchPostsWithTags('dummy', ['no_tag'], options, 0)).toHaveLength(0);
+    });
+
+    test('searchPostsWithTags search-inclusive-self', async () => {
+      const options: IOptions = {
+        userScope: 'self',
+        tagScope: 'inclusive'
+      };
+    
+      expect(await content.searchPostsWithTags('dummy', ['no_tag'], options, 0)).toHaveLength(0);
+    });
+
+    test('searchPostsWithTags search-exclusive-all', async () => {
+      const options: IOptions = {
+        userScope: 'all',
+        tagScope: 'exclusive'
+      };
+    
+      expect(await content.searchPostsWithTags('dummy', ['no_tag'], options, 0)).toHaveLength(0);
+    });
+
+    test('searchPostsWithTags search-exclusive-followed', async () => {
+      const options: IOptions = {
+        userScope: 'followed',
+        tagScope: 'exclusive'
+      };
+    
+      expect(await content.searchPostsWithTags('dummy', ['no_tag'], options, 0)).toHaveLength(0);
+    });
+
+    test('searchPostsWithTags search-exclusive-self', async () => {
+      const options: IOptions = {
+        userScope: 'self',
+        tagScope: 'exclusive'
+      };
+    
+      expect(await content.searchPostsWithTags('dummy', ['no_tag'], options, 0)).toHaveLength(0);
     });
   });
 });

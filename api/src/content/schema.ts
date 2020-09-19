@@ -14,7 +14,7 @@ export const searchPosts = Joi.object({
     Joi.string().regex(/^[a-zA-Z0-9]{1,99}$/).required()
   ).required(),
   options: Joi.object({
-    userScope: Joi.string().valid('all', 'followed').required(),
+    userScope: Joi.string().valid('all', 'followed', 'self').required(),
     tagScope: Joi.string().valid('inclusive', 'exclusive').required()
   }).required(),
   page: Joi.number().integer().min(0).max(99999).required()

@@ -171,11 +171,12 @@ export const searchPostsWithTags = async (
   const tag_ids = await db.tx(t => {
     return t.batch(tags.map((tag) => {
       tagQuery.values = [tag];
-      return t.one(tagQuery);
+      return t.oneOrNone(tagQuery);
     }));
   });
 
-  const fixedIds = tag_ids.map((tag) => tag.tag_id);
+  const fixedIds = tag_ids.filter((tag) => tag !== null).map((tag) => tag.tag_id);
+  if (fixedIds.length === 0) return [];
 
   /* Inclusive means it returns posts with tags: 
    *    'x', or 'y', or 'x' and 'y'
@@ -191,7 +192,7 @@ export const searchPostsWithTags = async (
       const query = new PS({ name: 'search-inclusive-followed', text: '\
         SELECT post, url, tags, p.date, a.username, a.name FROM posts p \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
-        INNER JOIN follows f ON f.user_id_follower = p.user_id \
+        INNER JOIN follows f ON f.user_id_followed = p.user_id \
         INNER JOIN accounts a ON a.user_id = f.user_id_follower \
         WHERE pt.tag_id && $2 AND a.username = $1\
         ORDER BY p.date desc LIMIT 11 OFFSET $3 \
@@ -200,7 +201,7 @@ export const searchPostsWithTags = async (
 
       return await db.manyOrNone(query);
 
-    } else {
+    } else if (options.userScope === 'all') {
       /* ============ ALL ============ */
       const query = new PS({ name: 'search-inclusive-all', text: '\
         SELECT post, url, tags, p.date, a.username, a.name FROM posts p \
@@ -212,8 +213,20 @@ export const searchPostsWithTags = async (
       });
 
       return await db.manyOrNone(query);
-    }
 
+    } else {
+      /* ============ SELF ============ */
+      const query = new PS({ name: 'search-inclusive-self', text: '\
+        SELECT post, url, tags, p.date, a.username, a.name FROM posts p \
+        INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
+        INNER JOIN accounts a ON a.user_id = p.user_id \
+        WHERE pt.tag_id && $2 AND a.username = $1\
+        ORDER BY p.date desc LIMIT 11 OFFSET $3 \
+        ', values: [username, fixedIds, offset]
+      });
+
+      return await db.manyOrNone(query);
+    }
   
   } else {
   /* ============================== EXCLUSIVE ============================== */
@@ -223,7 +236,7 @@ export const searchPostsWithTags = async (
       const query = new PS({ name: 'search-exclusive-followed', text: '\
         SELECT post, url, tags, p.date, a.username, a.name FROM posts p \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
-        INNER JOIN follows f ON f.user_id_follower = p.user_id \
+        INNER JOIN follows f ON f.user_id_followed = p.user_id \
         INNER JOIN accounts a ON a.user_id = f.user_id_follower \
         WHERE pt.tag_id = $2 AND a.username = $1\
         ORDER BY p.date desc LIMIT 11 OFFSET $3 \
@@ -232,7 +245,7 @@ export const searchPostsWithTags = async (
 
       return await db.manyOrNone(query);
 
-    } else {
+    } else if (options.userScope === 'all') {
       /* ============ ALL ============ */
       const query = new PS({ name: 'search-exclusive-all', text: '\
         SELECT post, url, tags, p.date, a.username, a.name FROM posts p \
@@ -241,6 +254,19 @@ export const searchPostsWithTags = async (
         WHERE pt.tag_id = $1 \
         ORDER BY p.date desc LIMIT 11 OFFSET $2 \
         ', values: [fixedIds, offset]
+      });
+
+      return await db.manyOrNone(query);
+
+    } else {
+      /* ============ SELF ============ */
+      const query = new PS({ name: 'search-exclusive-self', text: '\
+        SELECT post, url, tags, p.date, a.username, a.name FROM posts p \
+        INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
+        INNER JOIN accounts a ON a.user_id = p.user_id \
+        WHERE pt.tag_id = $2 AND a.username = $1\
+        ORDER BY p.date desc LIMIT 11 OFFSET $3 \
+        ', values: [username, fixedIds, offset]
       });
 
       return await db.manyOrNone(query);

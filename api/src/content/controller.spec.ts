@@ -96,6 +96,68 @@ describe('function calls with authentication', () => {
       }
     });
 
+    describe('tags dont exist', () => {
+      test('search exclusive all', async () => {
+        const options = { userScope: 'all', tagScope: 'exclusive' };
+
+        const data = { username: 'dummy', tags: ['tag4'], options, page: 1 };
+        const posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(0);
+        expect(posts.status).toStrictEqual(200);
+      });
+
+      test('search exclusive followed', async () => {
+        const options = { userScope: 'followed', tagScope: 'exclusive' };
+
+        const data = { username: 'dummy', tags: ['tag4'], options, page: 1 };
+        const posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(0);
+        expect(posts.status).toStrictEqual(200);
+      });
+
+      test('search exclusive self', async () => {
+        const options = { userScope: 'self', tagScope: 'exclusive' };
+
+        const data = { username: 'dummy', tags: ['tag4'], options, page: 1 };
+        const posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(0);
+        expect(posts.status).toStrictEqual(200);
+      });
+
+      test('search inclusive all', async () => {
+        const options = { userScope: 'all', tagScope: 'inclusive' };
+
+        const data = { username: 'dummy', tags: ['tag4'], options, page: 1 };
+        const posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(0);
+        expect(posts.status).toStrictEqual(200);
+      });
+
+      test('search inclusive followed', async () => {
+        const options = { userScope: 'followed', tagScope: 'inclusive' };
+
+        const data = { username: 'dummy', tags: ['tag4'], options, page: 1 };
+        const posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(0);
+        expect(posts.status).toStrictEqual(200);
+      });
+
+      test('search inclusive self', async () => {
+        const options = { userScope: 'self', tagScope: 'inclusive' };
+
+        const data = { username: 'dummy', tags: ['tag4'], options, page: 1 };
+        const posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(0);
+        expect(posts.status).toStrictEqual(200);
+      });
+    });
+
     describe('search exclusive', () => {
       test('search exclusive all, one tag', async () => {
         const options = { userScope: 'all', tagScope: 'exclusive' };
@@ -201,6 +263,74 @@ describe('function calls with authentication', () => {
 
       test('search exclusive followed only, all tags', async () => {
         const options = { userScope: 'followed', tagScope: 'exclusive' };
+
+        const data = { username: 'dummy', tags: ['tag1', 'tag2', 'tag3'], options, page: 1 };
+        let posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(6);
+        expect(posts.status).toStrictEqual(200);
+
+        expect(posts.body).toEqual(
+          expect.arrayContaining(
+            [expect.objectContaining({ tags: ['tag1', 'tag2', 'tag3'] })]
+          )
+        );
+
+        expect(posts.body).not.toEqual(
+          expect.arrayContaining(
+            [expect.objectContaining({ tags: ['tag1'] })]
+          )
+        );
+
+        data.page = 2;
+        posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(0);
+        expect(posts.status).toStrictEqual(200);
+
+        data.page = 3;
+        posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(0);
+        expect(posts.status).toStrictEqual(200);
+      });
+
+      test('search exclusive self only, one tag', async () => {
+        const options = { userScope: 'self', tagScope: 'exclusive' };
+
+        const data = { username: 'dummy', tags: ['tag1'], options, page: 1 };
+        let posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(6);
+        expect(posts.status).toStrictEqual(200);
+
+        expect(posts.body).toEqual(
+          expect.arrayContaining(
+            [expect.objectContaining({ tags: ['tag1'] })]
+          )
+        );
+
+        expect(posts.body).not.toEqual(
+          expect.arrayContaining(
+            [expect.objectContaining({ tags: ['tag1', 'tag2', 'tag3'] })]
+          )
+        );
+
+        data.page = 2;
+        posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(0);
+        expect(posts.status).toStrictEqual(200);
+
+        data.page = 3;
+        posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(0);
+        expect(posts.status).toStrictEqual(200);
+      });
+
+      test('search exclusive self only, all tags', async () => {
+        const options = { userScope: 'self', tagScope: 'exclusive' };
 
         const data = { username: 'dummy', tags: ['tag1', 'tag2', 'tag3'], options, page: 1 };
         let posts = await agent.post(`${url}/search`).send(data);
@@ -344,6 +474,64 @@ describe('function calls with authentication', () => {
               expect.objectContaining({ tags: ['tag1', 'tag2', 'tag3'] })
             ]
           )
+        );
+
+        data.page = 2;
+        posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(2);
+        expect(posts.status).toStrictEqual(200);
+
+        data.page = 3;
+        posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(0);
+        expect(posts.status).toStrictEqual(200);
+      });
+
+      test('search inclusive self only, one tag', async () => {
+        const options = { userScope: 'self', tagScope: 'inclusive' };
+
+        const data = { username: 'dummy', tags: ['tag1'], options, page: 1 };
+        let posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(11);
+        expect(posts.status).toStrictEqual(200);
+
+        expect(posts.body).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ tags: ['tag1'] }),
+            expect.objectContaining({ tags: ['tag1', 'tag2', 'tag3'] })
+          ])
+        );
+
+        data.page = 2;
+        posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(2);
+        expect(posts.status).toStrictEqual(200);
+
+        data.page = 3;
+        posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(0);
+        expect(posts.status).toStrictEqual(200);
+      });
+
+      test('search inclusive self only, all tags', async () => {
+        const options = { userScope: 'self', tagScope: 'inclusive' };
+
+        const data = { username: 'dummy', tags: ['tag1', 'tag2', 'tag3'], options, page: 1 };
+        let posts = await agent.post(`${url}/search`).send(data);
+
+        expect(posts.body).toHaveLength(11);
+        expect(posts.status).toStrictEqual(200);
+
+        expect(posts.body).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ tags: ['tag1'] }),
+            expect.objectContaining({ tags: ['tag1', 'tag2', 'tag3'] })
+          ])
         );
 
         data.page = 2;
