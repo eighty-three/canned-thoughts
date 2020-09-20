@@ -209,7 +209,28 @@ export const searchPostsWithTags = async (
   });
 
   const fixedIds = tag_ids.filter((tag) => tag !== null).map((tag) => tag.tag_id);
-  if (fixedIds.length === 0) return [];
+  /* If there aren't any tags left, meaning all the input tags were not in
+   * the `tags` table, return an empty array.
+   *
+   * e.g. ['tag1', 'tag2', 'tag3'] where none of these are in the `tags` table
+   * so after filtering, what remains is []; return an empty array
+   *
+   *
+   * Or if after filtering the tags, the output's length is not the same 
+   * as the input's length, meaning there is a tag in the input that is 
+   * not in the tags table, where if the tagScope is `exclusive`, it means
+   * that there is no post containing that tag, so return an empty array
+   *
+   * e.g. ['tag1', 'tag2', 'tag3'] where `tag3` does not exist in the `tags` table
+   * so after filtering, what remains is ['tag1', 'tag2'], meaning the input length
+   * is not the same as the output length, meaning there isn't a post containing those
+   * the searched tags exclusively; return an empty array
+   */
+  if (
+    !fixedIds.length 
+    || (fixedIds.length !== tags.length && options.tagScope === 'exclusive')
+  ) return [];
+
 
   /* Inclusive means it returns posts with tags: 
    *    'x', or 'y', or 'x' and 'y'
