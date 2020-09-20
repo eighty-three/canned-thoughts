@@ -36,4 +36,10 @@ router.get('/getallposts',
   content.getPosts
 );
 
+router.post('/dashboard',
+  validator(contentSchema.getDashboardPosts, 'body'),
+  authToken.verifyToken,
+  content.getDashboardPosts
+);
+
 export default router;

@@ -106,6 +106,22 @@ export const getPosts = async (
   return await db.manyOrNone(query);
 };
 
+export const getDashboardPosts = async (
+  username: string,
+): Promise<IPost[] | null> => {
+  const query = new PS({ name: 'get-posts', text: '\
+    SELECT post, url, tags, p.date, a.username, a.name FROM posts p \
+    INNER JOIN follows f ON f.user_id_followed = p.user_id \
+    INNER JOIN accounts a ON a.user_id = f.user_id_follower \
+    INNER JOIN accounts a2 ON a.user_id = p.user_id \
+    WHERE a.username=$1 OR a2.username=$1\
+    ORDER BY p.date desc LIMIT 10'
+  });
+
+  query.values = [username];
+  return await db.manyOrNone(query);
+};
+
 export const deletePost = async (
   url: string
 ): Promise<void> => {

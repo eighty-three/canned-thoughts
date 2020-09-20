@@ -34,3 +34,7 @@ export const getPosts = Joi.object({
   username: Joi.string().regex(/^[a-zA-Z0-9_]{1,29}$/).required(),
   page: Joi.number().integer().min(0).max(99999).required()
 });
+
+export const getDashboardPosts = Joi.object({
+  username: Joi.string().regex(/^[a-zA-Z0-9_]{1,29}$/).required(),
+});

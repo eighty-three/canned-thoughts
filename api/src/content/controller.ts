@@ -45,3 +45,9 @@ export const getPosts: RequestHandler = async (req, res) => {
   const posts = await content.getPosts(username, offset);
   res.json(posts);
 };
+
+export const getDashboardPosts: RequestHandler = async (req, res) => {
+  const { username } = req.body;
+  const posts = await content.getDashboardPosts(username);
+  res.json(posts);
+};
