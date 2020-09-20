@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
+import { useForm } from 'react-hook-form';
 
 import utilStyles from '@/styles/utils.module.css';
 
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+
 import { updateProfileInfo } from '@/lib/profile';
 
 const propTypes = {
@@ -21,14 +22,16 @@ const ProfileInfoForm = (props) => {
     username
   } = props;
 
-  const [submitStatus, setSubmitStatus] = useState('Update Profile Info');
-  const { register, handleSubmit } = useForm();
+  const [submitStatus, setSubmitStatus] = useState({ disabled: false, text: 'Update Profile Info' });
+  const { register, handleSubmit, errors } = useForm();
 
-  const revertStatus = () => setSubmitStatus('Update Profile Info');
-
-  const submitShowError = async (data) => {
-    const req = await updateProfileInfo(data, username);
-    if (req) setSubmitStatus(req);
+  const revertSubmitStatus = () => setSubmitStatus({ disabled: false, text: 'Update Profile Info' });
+  const showSubmitStatus = async (data) => {
+    setSubmitStatus({ disabled: true, text: 'Sending...' });
+    const submitSuccess = await updateProfileInfo(username, data);
+    if (submitSuccess) {
+      setSubmitStatus({ disabled: false, text: submitSuccess });
+    }
   };
 
   return (
@@ -44,42 +47,55 @@ const ProfileInfoForm = (props) => {
       </style>
 
       <div className={`w-75 mx-auto ${utilStyles.pd20}`}>
-        <Form className="mx-auto" onSubmit={handleSubmit(submitShowError)}>
+        <Form className="mx-auto" onSubmit={handleSubmit(showSubmitStatus)}>
 
           <Form.Group controlId='formProfileName'>
-            <Form.Label>Name:</Form.Label>
+            <Form.Label>Name:
+              {errors.newName &&
+              <p className={`${utilStyles.formError}`}>{errors.newName.message}</p>
+              }
+            </Form.Label>
             <Form.Control 
               type="text"
-              maxLength={50}
-              pattern="[a-zA-Z0-9_$!@?#-]{1,49}"
-              placeholder="[ a-zA-Z0-9_$!@?#- ]{1,49}"
               spellCheck="false"
               aria-describedby="profileName"
               name="newName"
               defaultValue={name}
-              ref={register({ required: true })} 
+              ref={register({
+                required: true,
+                pattern: {
+                  value: /^[\\/\[\]\(\) a-zA-Z0-9 _'":;~%^&*$!@?#,.-]{1,49}$/,
+                  message: 'Invalid characters or length (max 50). Try again'
+                }
+              })}
             />
           </Form.Group>
 
           <Form.Group controlId='formProfileDescription'>
-            <Form.Label>Description:</Form.Label>
+            <Form.Label>Description:
+              {errors.newDescription &&
+              <p className={`${utilStyles.formError}`}>{errors.newDescription.message}</p>
+              }
+            </Form.Label>
             <Form.Control 
               as="textarea" 
               rows="5"
               type="text"
-              maxLength={160}
-              pattern="[a-z0-9_$!@?#-]{1,159}"
-              placeholder="[ a-z0-9_$!@?#- ]{1,159}"
               spellCheck="false"
               aria-describedby="profileDescription"
               name="newDescription"
               defaultValue={description}
-              ref={register({ required: true })} 
+              ref={register({
+                pattern: {
+                  value: /^[\\/\[\]\(\) a-zA-Z0-9 _'":;~%^&*$!@?#,.-]{1,149}$/,
+                  message: 'Invalid characters or length (max 150). Try again'
+                }
+              })}
             />
           </Form.Group>
 
-          <Button onBlur={revertStatus} variant="dark" type="submit" block>
-            {submitStatus}
+          <Button onBlur={revertSubmitStatus} variant="dark" type="submit" block disabled={submitStatus.disabled}>
+            {submitStatus.text}
           </Button>
 
         </Form>
