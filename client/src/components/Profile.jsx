@@ -24,23 +24,24 @@ const Profile = (props) => {
   } = props;
 
   const [ followStatusState, setFollowStatusState ] = useState({ followStatus, followers });
-  const profileUsername = username; // For clarity
 
-  useEffect(() => { // Necessary so that the followers count gets refreshed when changing profiles through Router
+  useEffect(() => {
     setFollowStatusState({ followStatus, followers });
   }, [followStatus, followers]);
 
   const handleButtonClick = async (loggedInUsername, profileUsername) => {
-    await toggleFollowStatus(loggedInUsername, profileUsername); // Change the follow status in the database
+    const check = await toggleFollowStatus(loggedInUsername, profileUsername); // Change the follow status in the database
 
-    const newFollowStatus = (followStatusState.followStatus)
-      ? { followStatus: !followStatusState.followStatus, followers: followStatusState.followers - 1 }
-      : { followStatus: !followStatusState.followStatus, followers: followStatusState.followers + 1 };
+    if (!check.error) {
+      const newFollowStatus = (followStatusState.followStatus)
+        ? { followStatus: !followStatusState.followStatus, followers: followStatusState.followers - 1 }
+        : { followStatus: !followStatusState.followStatus, followers: followStatusState.followers + 1 };
 
-    setFollowStatusState(newFollowStatus); 
-    /* Set followStatus to the opposite of its current state instead of having to make a request to the database
-     * Similarly, for the followers count, just add or deduct instead of having to make a request to the database
-     */
+      setFollowStatusState(newFollowStatus);
+      /* Set followStatus to the opposite of its current state instead of having to make a request to the database
+       * Similarly, for the followers count, just add or deduct instead of having to make a request to the database
+       */
+    }
   };
 
   
@@ -48,12 +49,12 @@ const Profile = (props) => {
     <Card style={{ width: '100%' }}>
       <Card.Body>
         <Card.Title>{name}</Card.Title>
-        <Card.Subtitle>{profileUsername}</Card.Subtitle>
+        <Card.Subtitle>{username}</Card.Subtitle>
         <Card.Text>{description}</Card.Text>
         <hr />
         <span>Followers: {followStatusState.followers}</span> 
-        {(loggedInUsername && loggedInUsername !== profileUsername) &&
-          <button onClick={() => handleButtonClick(loggedInUsername, profileUsername)}>
+        {(loggedInUsername && loggedInUsername !== username) &&
+          <button onClick={() => handleButtonClick(loggedInUsername, username)}>
             {followStatusState.followStatus
               ? 'Unfollow'
               : 'Follow'
