@@ -44,8 +44,6 @@ const Explore = (props) => {
     posts
   } = props;
 
-  const [ formState, setFormState ] = useState({ tags, userScope, tagScope });
-
   const initialPaginationState = {
     page: page,
     posts: posts,
@@ -54,27 +52,25 @@ const Explore = (props) => {
   };
 
   const [ state, dispatch ] = useReducer(PaginationReducer, initialPaginationState);
+
+  const [ formState, setFormState ] = useState({ tags, userScope, tagScope });
   const router = useRouter();
 
   useEffect(() => {
     const postsPayload = (posts && posts.length) ? posts: [];
     dispatch({ type: 'update', payload: { posts: postsPayload, page }});
-  }, [posts, page]);
+  }, [tags, userScope, tagScope, page]);
 
-  const onButtonClick = async (data) => {
+  const onSubmit = async (data) => {
     setFormState({
       tags: data.tags,
       userScope: data.userScope,
       tagScope: data.tagScope
     });
 
-    const newPosts = await searchPosts(username, data, 1);
-    dispatch({ type: 'first', payload: newPosts });
-
     const queryTags = data.tags.trim().split(' ').join(',');
-
     router.push(
-      `/explore?tags=${queryTags}&userScope=${data.userScope}&tagScope=${data.tagScope}&page=1`,
+      `/explore?tags=${queryTags}&userScope=${data.userScope}&tagScope=${data.tagScope}&page=1`
     );
   };
 
@@ -99,7 +95,7 @@ const Explore = (props) => {
       <section className={utilStyles.headingMd}>
         <SearchForm
           tags={tags}
-          searchPostsFn={onButtonClick}
+          searchPostsFn={onSubmit}
         />
 
         {posts &&
