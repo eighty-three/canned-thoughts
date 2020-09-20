@@ -110,17 +110,30 @@ export const getDashboardPosts = async (
   username: string,
 ): Promise<IPost[] | null> => {
   const query = new PS({ name: 'get-dashboard-posts', text: '\
-    WITH post_id_table AS ( \
-      SELECT post_id from posts p \
+    WITH post_ids_from_followed AS ( \
+      SELECT post_id FROM posts p \
       INNER JOIN follows f ON f.user_id_followed = p.user_id \
       INNER JOIN accounts a ON a.user_id = f.user_id_follower \
+      WHERE a.username = $1 \
+      ORDER BY p.date DESC LIMIT 10 \
+    ), post_ids_from_self AS ( \
+      SELECT post_id FROM posts p \
+      INNER JOIN accounts a ON a.user_id = p.user_id \
       WHERE a.username = $1 \
       ORDER BY p.date DESC LIMIT 10 \
     ) \
     SELECT post, url, tags, TO_CHAR(p.date, \'Mon DD, YYYY - HH24:MI:SS\') date, username, name FROM accounts a \
     INNER JOIN posts p ON p.user_id = a.user_id \
-    WHERE p.post_id IN (SELECT post_id from post_id_table)'
+    WHERE p.post_id IN (SELECT post_id from post_ids_from_followed UNION SELECT post_id from post_ids_from_self) \
+    ORDER BY p.date DESC LIMIT 10'
   });
+
+  /* First part of the query gets the post_id's from the users the logged in user follows
+   * Second part of the query gets the post_id's from the logged in user itself (self posts)
+   * Third part of the query gets the posts from the post_id's from the first two parts
+   * I can't figure out a way of doing the first and second part in a single query
+   * This whole query apparently takes 3ms in total according to EXPLAIN ANALYZE
+   */
 
   query.values = [username];
   return await db.manyOrNone(query);
