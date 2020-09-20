@@ -1,15 +1,16 @@
-import Head from 'next/head';
 import React from 'react';
+import Head from 'next/head';
 
 import Layout, { siteTitle } from '@/components/Layout';
 import utilStyles from '@/styles/utils.module.css';
-import withAuthComponent from '@/components/withAuth';
-import withAuthServerSideProps from '@/components/withAuthGSSP';
+import withAuthComponent from '@/components/AuthComponents/withAuth';
+import withAuthServerSideProps from '@/components/AuthComponents/withAuthGSSP';
 
-import { login } from '@/lib/account';
 import CustomAuthForms from '@/components/CustomAuthForms';
 
-function LoginPage() {
+import { login } from '@/lib/account';
+
+const LoginPage = () => {
   return (
     <Layout login>
       <Head>
@@ -20,12 +21,12 @@ function LoginPage() {
           forms={['username', 'password']} 
           title={'Log in'} 
           submitFunction={login}
-          login
+          context={'login'}
         />
       </section>
     </Layout>
   );
-}
+};
 
 export default withAuthComponent(LoginPage, 'loggedIn');
 export const getServerSideProps = withAuthServerSideProps();

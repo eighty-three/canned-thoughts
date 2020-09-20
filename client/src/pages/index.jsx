@@ -3,18 +3,19 @@ import React, { useState } from 'react';
 
 import Layout, { siteTitle } from '@/components/Layout';
 import utilStyles from '@/styles/utils.module.css';
-import withAuthComponent from '@/components/withAuth';
-import withAuthServerSideProps from '@/components/withAuthGSSP';
+import withAuthComponent from '@/components/AuthComponents/withAuth';
+import withAuthServerSideProps from '@/components/AuthComponents/withAuthGSSP';
 
-import { login, signup } from '@/lib/account';
 import CustomAuthForms from '@/components/CustomAuthForms';
 
-function LandingPage() {
+import { login, signup } from '@/lib/account';
+
+const LandingPage = () => {
   const loginArgs = {
     form: {
       submitFunction: login,
       title: 'Log in',
-      login: true
+      context: 'login'
     },
     helpText: 'Don\'t have an account yet?'
   };
@@ -22,7 +23,8 @@ function LandingPage() {
   const signupArgs = {
     form: {
       submitFunction: signup,
-      title: 'Sign up'
+      title: 'Sign up',
+      context: 'signup'
     },
     helpText: 'Already have an account?'
   };
@@ -30,7 +32,7 @@ function LandingPage() {
   const [ formArgs, setFormArgs ] = useState(loginArgs);
 
   const toggleForm = () => {
-    (formArgs.form.login)
+    (formArgs.form.context === 'login')
       ? setFormArgs({...signupArgs})
       : setFormArgs({...loginArgs});
   };
@@ -57,7 +59,7 @@ function LandingPage() {
       </section>
     </Layout>
   );
-}
+};
 
 export default withAuthComponent(LandingPage, 'loggedIn');
 export const getServerSideProps = withAuthServerSideProps();
