@@ -1,0 +1,11 @@
+.wrap {
+  word-wrap: break-word;
+}
+
+.links {
+  color: rgb(130, 25, 25);
+}
+
+.links:hover {
+  color: rgb(90, 15, 15);
+}
