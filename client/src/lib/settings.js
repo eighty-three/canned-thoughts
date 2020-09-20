@@ -11,14 +11,9 @@ export const changePassword = async (username, data) => {
   };
 
   try {
-    const req = await ky.post(`${api}/password`, { json: queryData });
+    const req = await ky.post(`${api}/password`, { json: queryData, throwHttpErrors: false });
     const response = await req.json();
-
-    if (response.error) {
-      return response.error;
-    } else {
-      return response.message;
-    }
+    return response;
   } catch (err) {
     return { error: 'Something went wrong' };
   }
@@ -31,12 +26,9 @@ export const changeUsername = async (username, data) => {
   };
 
   try {
-    const req = await ky.post(`${api}/username`, { json: queryData });
+    const req = await ky.post(`${api}/username`, { json: queryData, throwHttpErrors: false });
     const response = await req.json();
-
-    if (response.error) {
-      return response.error;
-    }
+    if (response.error) return response;
 
     await logout();
   } catch (err) {
@@ -51,12 +43,9 @@ export const deleteAccount = async (username, data) => {
   };
 
   try {
-    const req = await ky.post(`${api}/delete`, { json: queryData });
+    const req = await ky.post(`${api}/delete`, { json: queryData, throwHttpErrors: false });
     const response = await req.json();
-
-    if (response.error) {
-      return response.error;
-    }
+    if (response.error) return response;
 
     await logout();
   } catch (err) {

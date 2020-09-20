@@ -22,16 +22,18 @@ const ProfileInfoForm = (props) => {
     username
   } = props;
 
-  const [submitStatus, setSubmitStatus] = useState({ disabled: false, text: 'Update Profile Info' });
+  const [ buttonState, setButtonState ] = useState({ disabled: false, text: 'Update Profile Info' });
   const { register, handleSubmit, errors } = useForm();
 
-  const revertSubmitStatus = () => setSubmitStatus({ disabled: false, text: 'Update Profile Info' });
-  const showSubmitStatus = async (data) => {
-    setSubmitStatus({ disabled: true, text: 'Sending...' });
-    const submitSuccess = await updateProfileInfo(username, data);
-    if (submitSuccess) {
-      setSubmitStatus({ disabled: false, text: submitSuccess });
-    }
+  const revertButtonState = () => setButtonState({ ...buttonState, text: 'Update Profile Info' });
+
+  const onSubmit = async (data) => {
+    setButtonState({ disabled: true, text: 'Sending...' });
+    const req = await updateProfileInfo(username, data);
+
+    (!req.error)
+      ? setButtonState({ disabled: false, text: req.message })
+      : setButtonState({ disabled: false, text: req.error });
   };
 
   return (
@@ -47,7 +49,7 @@ const ProfileInfoForm = (props) => {
       </style>
 
       <div className={`w-75 mx-auto ${utilStyles.pd20}`}>
-        <Form className="mx-auto" onSubmit={handleSubmit(showSubmitStatus)}>
+        <Form className="mx-auto" onSubmit={handleSubmit(onSubmit)}>
 
           <Form.Group controlId='formProfileName'>
             <Form.Label>Name:
@@ -94,8 +96,8 @@ const ProfileInfoForm = (props) => {
             />
           </Form.Group>
 
-          <Button onBlur={revertSubmitStatus} variant="dark" type="submit" block disabled={submitStatus.disabled}>
-            {submitStatus.text}
+          <Button onBlur={revertButtonState} variant="dark" type="submit" block disabled={buttonState.disabled}>
+            {buttonState.text}
           </Button>
 
         </Form>

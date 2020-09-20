@@ -30,19 +30,20 @@ const CustomAuthForms = (props) => {
     router
   } = props;
 
-  const [submitStatus, setSubmitStatus] = useState(title);
+  const [ buttonState, setButtonState ] = useState({ disabled: false, text: 'Submit' });
 
   useEffect(() => {
-    setSubmitStatus(title);
+    setButtonState({ ...buttonState, text: title });
   }, [title]);
 
   const { register, handleSubmit } = useForm();
 
-  const revertStatus = () => setSubmitStatus(title);
+  const revertStatus = () => setButtonState({ ...buttonState, text: title });
 
-  const submitShowError = async (data) => {
+  const onSubmit = async (data) => {
     let req;
     const prevPath = router.query;
+    setButtonState({ disabled: true, text: 'Sending...' });
 
     switch (context) {
       case 'login':
@@ -56,7 +57,13 @@ const CustomAuthForms = (props) => {
         break;
     }
 
-    if (req) setSubmitStatus(req);
+    // Need to explicitly state that req exists for when signing up or logging in,
+    // aka cases whose successful "return values" are just redirects
+    if (req && !req.error) {
+      setButtonState({ disabled: false, text: req.message });
+    } else if (req && req.error) {
+      setButtonState({ disabled: false, text: req.error });
+    }
   };
 
   return (
@@ -72,13 +79,13 @@ const CustomAuthForms = (props) => {
       </style>
 
       <div className={`w-75 mx-auto ${utilStyles.pd20}`}>
-        <Form className="mx-auto" onSubmit={handleSubmit(submitShowError)}>
+        <Form className="mx-auto" onSubmit={handleSubmit(onSubmit)}>
           {forms.map((form) => transForm(form)).map((formData) =>
             <IndividualForm key={formData.id} {...formData} title={title} register={register} />
           )}
 
-          <Button onBlur={revertStatus} variant="dark" type="submit" block>
-            {submitStatus}
+          <Button onBlur={revertStatus} variant="dark" type="submit" block disabled={buttonState.disabled}>
+            {buttonState.text}
           </Button>
         </Form>
       </div>

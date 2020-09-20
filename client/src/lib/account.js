@@ -9,7 +9,7 @@ export const signup = async (data) => {
     const response = await req.json();
     
     if (response.error) {
-      return response.error;
+      return response;
     } else {
       Router.replace('/dashboard');
     }
@@ -33,7 +33,7 @@ export const login = async (prevPath, data) => {
     const response = await req.json();
     
     if (response.error) {
-      return response.error;
+      return response;
     } else {
       Router.replace(`${newPath}`);
     }
