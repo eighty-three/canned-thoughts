@@ -1,55 +1,73 @@
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import Head from 'next/head';
-import React from 'react';
-import { useForm } from 'react-hook-form';
 
 import Layout, { siteTitle } from '@/components/Layout';
-import utilStyles from '@/styles/utils.module.css';
-import withAuthComponent from '@/components/withAuth';
-import withAuthServerSideProps from '@/components/withAuthGSSP';
+import withAuthComponent from '@/components/AuthComponents/withAuth';
+import withAuthServerSideProps from '@/components/AuthComponents/withAuthGSSP';
 
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import { writeThought } from '@/lib/content';
-import Thought from '@/components/Thought';
+/* The `Posts` component is used instead of `PostsContainer`
+ * because its functionality is just unnecessary clutter for
+ * the dashboard. For pagination, just go to the profile page.
+ */
+import Posts from '@/components/PostComponents/Posts';
+import PostForm from '@/components/PostForm';
 
-const thought = 'Some quick example text to build on the card';
-const date = 'sample_date';
-const tags = 'tag1, tag2, tag3';
+import { getDashboardPosts } from '@/lib/content';
 
-function Dashboard({ username }) {
-  const { register, handleSubmit, errors } = useForm();
+const propTypes = {
+  username: PropTypes.string,
+  posts: PropTypes.arrayOf(
+    PropTypes.shape({
+      username: PropTypes.string,
+      name: PropTypes.string,
+      post: PropTypes.string,
+      date: PropTypes.string,
+      tags: PropTypes.arrayOf(
+        PropTypes.string
+      ),
+      url: PropTypes.string
+    })
+  ),
+};
+
+const Dashboard = (props) => {
+  const {
+    username,
+    posts
+  } = props;
+
+  const [ totalPosts, setTotalPosts ] = useState(posts);
+
   return (
     <Layout username={username}>
       <Head>
         <title>{siteTitle}</title>
       </Head>
       <section>
-        <p className={utilStyles.headingMd}>Write your canned thought</p>
-        <Form onSubmit={handleSubmit(writeThought)}>
-          <Form.Control 
-            spellCheck="false"
-            as="textarea" 
-            rows="3"
-            type="text"
-            maxLength={250}
-            placeholder="Add up to three tags at the end #of #your #post"
-            aria-invalid={errors.content ? 'true' : 'false'}
-            aria-describedby="thoughtError" 
-            name="thought"
-            ref={register({ required: true })} 
-          />
+        <PostForm
+          username={username}
+          addToPosts={setTotalPosts}
+          currentPosts={totalPosts}
+        />
 
-          <Button variant="dark" type="submit" block>
-            Submit
-          </Button>
-        </Form>
-      </section>
-      <section>
-        <Thought username={username} thought={thought} date={date} tags={tags}/>
+        <Posts posts={totalPosts} />
       </section>
     </Layout>
   );
-}
+};
+
+Dashboard.propTypes = propTypes;
 
 export default withAuthComponent(Dashboard, 'protectRoute');
-export const getServerSideProps = withAuthServerSideProps();
+export const getServerSideProps = withAuthServerSideProps(async (ctx, username) => {
+  const posts = await getDashboardPosts(username, ctx);
+
+  return {
+    props:
+      {
+        username,
+        posts
+      }
+  };
+});
