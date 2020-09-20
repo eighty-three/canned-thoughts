@@ -2,47 +2,50 @@ import ky from 'ky-universal';
 import HOST from '@/lib/host';
 const api = `${HOST}/api/profile`;
 
-export async function updateProfileInfo(data, username) {
-  const request = await ky.post(`${api}/update`,
-    {
-      json:
-        {
-          username,
-          'newName': data.newName,
-          'newDescription': data.newDescription
-        }
-    });
+export const getNameAndDescription = async (username) => {
+  try {
+    const req = await ky.get(`${api}/getinfo?username=${username}`);
+    const response = await req.json();
+    return response;
+  } catch (err) {
+    return { name: null, description: null };
+  }
+};
 
-  const response = await request.json();
-  const responseMessage = (response.message)
-    ? response.message
-    : response.error;
-  return responseMessage;
-}
+export const getProfileInfo = async (profileUsername, loggedInUsername) => {
+  const query = (profileUsername !== loggedInUsername)
+    ? `profileUsername=${profileUsername}&loggedInUsername=${loggedInUsername}`
+    : `profileUsername=${profileUsername}`;
 
-export async function getNameAndDescription(username) {
+  try {
+    const req = await ky.get(`${api}/getall?${query}`);
+    const response = await req.json();
 
-  const request = await ky.post(`${api}/getinfo`,
-    {
-      json:
-        {
-          username
-        }
-    });
+    if (!response) {
+      return { error: 'Profile not found' };
+    } else {
+      return response;
+    }
+  } catch (err) {
+    return { error: 'Profile not found' };
+  }
+};
 
-  const response = await request.json();
-  return response;
-}
+export const updateProfileInfo = async (username, data) => {
+  const queryData = (data.newDescription)
+    ? { username, ...data }
+    : { username, newName: data.newName };
 
-export async function getProfileInfo(username) {
-  const request = await ky.post(`${api}/getall`,
-    {
-      json:
-        {
-          username
-        }
-    });
+  try {
+    const req = await ky.post(`${api}/update`, { json: queryData, throwHttpErrors: false });
+    const response = await req.json();
 
-  const response = await request.json();
-  return response;
-}
+    if (response.error) {
+      return response.error;
+    } else {
+      return response.message;
+    }
+  } catch (err) {
+    return { error: 'Something went wrong' };
+  }
+};

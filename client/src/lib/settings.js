@@ -4,57 +4,62 @@ const api = `${HOST}/api/settings`;
 
 import { logout } from './account';
 
-export async function changePassword(data, username) {
-  const req = await ky.post(`${api}/password`,
-    {
-      json:
-        {
-          username,
-          'password': data.password,
-          'newPassword': data.newPassword
-        }
-    });
-  const response = await req.json();
-  const responseMessage = (response.message)
-    ? response.message
-    : response.error;
-  if (response) {
-    return responseMessage;
-  } else {
-    return 'Something went wrong..';
-  }
-}
+export const changePassword = async (username, data) => {
+  const queryData = {
+    username,
+    ...data
+  };
 
-export async function changeUsername(data, username) {
-  const req = await ky.post(`${api}/username`,
-    {
-      json:
-        {
-          username,
-          'newUsername': data.newUsername,
-          'password': data.password
-        }
-    });
-  const response = await req.json();
-  if (response.error) {
-    return response.error;
-  }
-  await logout();
-}
+  try {
+    const req = await ky.post(`${api}/password`, { json: queryData });
+    const response = await req.json();
 
-export async function deleteAccount(data, username) {
-  const req = await ky.post(`${api}/delete`,
-    {
-      json:
-        {
-          username,
-          'password': data.password
-        }
-    });
-  const response = await req.json();
-  if (response.error) {
-    return response.error;
+    if (response.error) {
+      return response.error;
+    } else {
+      return response.message;
+    }
+  } catch (err) {
+    return { error: 'Something went wrong' };
   }
+};
 
-  await logout();
-}
+export const changeUsername = async (username, data) => {
+  const queryData = {
+    username,
+    ...data
+  };
+
+  try {
+    const req = await ky.post(`${api}/username`, { json: queryData });
+    const response = await req.json();
+
+    if (response.error) {
+      return response.error;
+    }
+
+    await logout();
+  } catch (err) {
+    return { error: 'Something went wrong' };
+  }
+};
+
+export const deleteAccount = async (username, data) => {
+  const queryData = {
+    username,
+    password: data.password
+  };
+
+  try {
+    const req = await ky.post(`${api}/delete`, { json: queryData });
+    const response = await req.json();
+
+    if (response.error) {
+      return response.error;
+    }
+
+    await logout();
+  } catch (err) {
+    return { error: 'Something went wrong' };
+  }
+};
