@@ -87,3 +87,8 @@
 .anchorColor, .anchorColor:hover {
   color: rgb(130, 25, 25);
 }
+
+.formError {
+  color: red;
+  font-size: 15px;
+}
