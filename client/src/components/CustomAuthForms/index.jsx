@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 
@@ -6,11 +7,31 @@ import utilStyles from '@/styles/utils.module.css';
 
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+
 import IndividualForm from '@/components/CustomAuthForms/IndividualForm';
 import transForm from '@/components/CustomAuthForms/transForm';
 
-function CustomAuthForms({ forms, title, submitFunction, username, login, router }) {
+const propTypes = {
+  forms: PropTypes.arrayOf(PropTypes.string),
+  title: PropTypes.string,
+  submitFunction: PropTypes.func,
+  context: PropTypes.oneOf(['login', 'signup', 'settings']),
+  username: PropTypes.string,
+  router: PropTypes.object
+};
+
+const CustomAuthForms = (props) => {
+  const {
+    forms,
+    title,
+    submitFunction,
+    context,
+    username,
+    router
+  } = props;
+
   const [submitStatus, setSubmitStatus] = useState(title);
+
   useEffect(() => {
     setSubmitStatus(title);
   }, [title]);
@@ -20,10 +41,21 @@ function CustomAuthForms({ forms, title, submitFunction, username, login, router
   const revertStatus = () => setSubmitStatus(title);
 
   const submitShowError = async (data) => {
+    let req;
     const prevPath = router.query;
-    const req = (login)
-      ? await submitFunction(data, prevPath)
-      : await submitFunction(data, username);
+
+    switch (context) {
+      case 'login':
+        req = await submitFunction(prevPath, data);
+        break;
+      case 'signup':
+        req = await submitFunction(data);
+        break;
+      case 'settings':
+        req = await submitFunction(username, data);
+        break;
+    }
+
     if (req) setSubmitStatus(req);
   };
 
@@ -44,6 +76,7 @@ function CustomAuthForms({ forms, title, submitFunction, username, login, router
           {forms.map((form) => transForm(form)).map((formData) =>
             <IndividualForm key={formData.id} {...formData} title={title} register={register} />
           )}
+
           <Button onBlur={revertStatus} variant="dark" type="submit" block>
             {submitStatus}
           </Button>
@@ -51,6 +84,8 @@ function CustomAuthForms({ forms, title, submitFunction, username, login, router
       </div>
     </>
   );
-}
+};
+
+CustomAuthForms.propTypes = propTypes;
 
 export default withRouter(CustomAuthForms);
