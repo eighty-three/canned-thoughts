@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import Router, { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
+import Router, { useRouter } from 'next/router';
 
 const RedirectComponentPropTypes = {
   loggedIn: PropTypes.bool,

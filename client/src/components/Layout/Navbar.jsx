@@ -3,7 +3,7 @@ import Link from 'next/link';
 import PropTypes from 'prop-types';
 
 import utilStyles from '@/styles/utils.module.css';
-import styles from '@/components/Navbar.module.css';
+import styles from '@/components/Layout/Navbar.module.css';
 
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
@@ -13,7 +13,11 @@ const LoggedInPropTypes = {
   username: PropTypes.string
 };
 
-const LoggedIn = ({ username }) => {
+const LoggedIn = (props) => {
+  const {
+    username
+  } = props;
+
   return (
     <>
       {/* Override for burger button */}
@@ -87,7 +91,12 @@ const NavbarComponentPropTypes = {
   redirect: PropTypes.string
 };
 
-const NavbarComponent = ({ username, redirect }) => {
+const NavbarComponent = (props) => {
+  const {
+    username,
+    redirect
+  } = props;
+
   return (
     <>
       {username 

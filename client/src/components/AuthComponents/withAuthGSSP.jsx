@@ -1,5 +1,6 @@
-import authCheck from '@/lib/authCheck';
 import PropTypes from 'prop-types';
+
+import authCheck from '@/lib/authCheck';
 
 const propTypes = {
   getServerSidePropsFunc: PropTypes.func

@@ -2,8 +2,8 @@ import Head from 'next/head';
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import styles from '@/components/Layout.module.css';
-import NavbarComponent from '@/components/Navbar';
+import styles from '@/components/Layout/Layout.module.css';
+import Navbar from '@/components/Layout/Navbar';
 
 export const siteTitle = 'Canned Thoughts';
 
@@ -40,8 +40,11 @@ const Layout = (props) => {
       
       {/* Contents */}
       <main>
-        { !home && !login
-          && <NavbarComponent username={username} redirect={redirect} />
+        { !home && !login &&
+          <Navbar
+            username={username}
+            redirect={redirect}
+          />
         }
         {children}
       </main>
