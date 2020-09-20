@@ -46,7 +46,7 @@ export const createPost = async (
         VALUES ((SELECT user_id FROM accounts WHERE username=$1), $2, $3, $4) \
         RETURNING user_id, post_id, post, url, tags, date \
       ) \
-      SELECT post_id, post, url, tags, TO_CHAR(ins.date, \'YYYY-MM-DD, HH12:MI:SS AM\') date, a.username, a.name FROM ins \
+      SELECT post_id, post, url, tags, TO_CHAR(ins.date, \'Mon DD, YYYY - HH24:MI:SS\') date, a.username, a.name FROM ins \
       INNER JOIN accounts a on a.user_id = ins.user_id'
     });
     createPost.values = [username, post, url, tags];
@@ -67,7 +67,7 @@ export const createPost = async (
         VALUES ((SELECT user_id FROM accounts WHERE username=$1), $2, $3) \
         RETURNING user_id, tags, post, url, date \
       ) \
-      SELECT post, url, tags, TO_CHAR(ins.date, \'YYYY-MM-DD, HH12:MI:SS AM\') date, a.username, a.name FROM ins \
+      SELECT post, url, tags, TO_CHAR(ins.date, \'Mon DD, YYYY - HH24:MI:SS\') date, a.username, a.name FROM ins \
       INNER JOIN accounts a on a.user_id = ins.user_id'
     });
     
@@ -81,7 +81,7 @@ export const getPost = async (
   url: string
 ): Promise<IPost | null> => {
   const query = new PS({ name: 'get-post', text: '\
-    SELECT post, url, tags, TO_CHAR(p.date, \'YYYY-MM-DD, HH12:MI:SS AM\') date, a.username, a.name FROM posts p \
+    SELECT post, url, tags, TO_CHAR(p.date, \'Mon DD, YYYY - HH24:MI:SS\') date, a.username, a.name FROM posts p \
     INNER JOIN accounts a on a.user_id = p.user_id \
     WHERE a.username=$1 AND p.url=$2'
   });
@@ -96,7 +96,7 @@ export const getPosts = async (
 ): Promise<IPost[] | null> => {
   // Returns posts in the range `offset` to `offset + 10` by account `username`
   const query = new PS({ name: 'get-posts', text: '\
-    SELECT post, url, tags, TO_CHAR(p.date, \'YYYY-MM-DD, HH12:MI:SS AM\') date, a.username, a.name FROM posts p \
+    SELECT post, url, tags, TO_CHAR(p.date, \'Mon DD, YYYY - HH24:MI:SS\') date, a.username, a.name FROM posts p \
     INNER JOIN accounts a ON a.user_id = p.user_id \
     WHERE a.username=$1 \
     ORDER BY p.date desc LIMIT 11 OFFSET $2'
@@ -110,7 +110,7 @@ export const getDashboardPosts = async (
   username: string,
 ): Promise<IPost[] | null> => {
   const query = new PS({ name: 'get-posts', text: '\
-    SELECT post, url, tags, TO_CHAR(p.date, \'YYYY-MM-DD, HH12:MI:SS AM\') date, a.username, a.name FROM posts p \
+    SELECT post, url, tags, TO_CHAR(p.date, \'Mon DD, YYYY - HH24:MI:SS\') date, a.username, a.name FROM posts p \
     INNER JOIN follows f ON f.user_id_followed = p.user_id \
     INNER JOIN accounts a ON a.user_id = f.user_id_follower \
     INNER JOIN accounts a2 ON a.user_id = p.user_id \
@@ -206,7 +206,7 @@ export const searchPostsWithTags = async (
     if (options.userScope === 'followed') {
       /* ============ FOLLOWED ============ */
       const query = new PS({ name: 'search-inclusive-followed', text: '\
-        SELECT post, url, tags, TO_CHAR(p.date, \'YYYY-MM-DD, HH12:MI:SS AM\') date, a.username, a.name FROM posts p \
+        SELECT post, url, tags, TO_CHAR(p.date, \'Mon DD, YYYY - HH24:MI:SS\') date, a.username, a.name FROM posts p \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
         INNER JOIN follows f ON f.user_id_followed = p.user_id \
         INNER JOIN accounts a ON a.user_id = f.user_id_follower \
@@ -220,7 +220,7 @@ export const searchPostsWithTags = async (
     } else if (options.userScope === 'all') {
       /* ============ ALL ============ */
       const query = new PS({ name: 'search-inclusive-all', text: '\
-        SELECT post, url, tags, TO_CHAR(p.date, \'YYYY-MM-DD, HH12:MI:SS AM\') date, a.username, a.name FROM posts p \
+        SELECT post, url, tags, TO_CHAR(p.date, \'Mon DD, YYYY - HH24:MI:SS\') date, a.username, a.name FROM posts p \
         INNER JOIN accounts a ON a.user_id = p.user_id \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
         WHERE pt.tag_id && $1 \
@@ -233,7 +233,7 @@ export const searchPostsWithTags = async (
     } else {
       /* ============ SELF ============ */
       const query = new PS({ name: 'search-inclusive-self', text: '\
-        SELECT post, url, tags, TO_CHAR(p.date, \'YYYY-MM-DD, HH12:MI:SS AM\') date, a.username, a.name FROM posts p \
+        SELECT post, url, tags, TO_CHAR(p.date, \'Mon DD, YYYY - HH24:MI:SS\') date, a.username, a.name FROM posts p \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
         INNER JOIN accounts a ON a.user_id = p.user_id \
         WHERE pt.tag_id && $2 AND a.username = $1\
@@ -250,7 +250,7 @@ export const searchPostsWithTags = async (
     if (options.userScope === 'followed') {
       /* ============ FOLLOWED ============ */
       const query = new PS({ name: 'search-exclusive-followed', text: '\
-        SELECT post, url, tags, TO_CHAR(p.date, \'YYYY-MM-DD, HH12:MI:SS AM\') date, a.username, a.name FROM posts p \
+        SELECT post, url, tags, TO_CHAR(p.date, \'Mon DD, YYYY - HH24:MI:SS\') date, a.username, a.name FROM posts p \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
         INNER JOIN follows f ON f.user_id_followed = p.user_id \
         INNER JOIN accounts a ON a.user_id = f.user_id_follower \
@@ -264,7 +264,7 @@ export const searchPostsWithTags = async (
     } else if (options.userScope === 'all') {
       /* ============ ALL ============ */
       const query = new PS({ name: 'search-exclusive-all', text: '\
-        SELECT post, url, tags, TO_CHAR(p.date, \'YYYY-MM-DD, HH12:MI:SS AM\') date, a.username, a.name FROM posts p \
+        SELECT post, url, tags, TO_CHAR(p.date, \'Mon DD, YYYY - HH24:MI:SS\') date, a.username, a.name FROM posts p \
         INNER JOIN accounts a ON a.user_id = p.user_id \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
         WHERE pt.tag_id = $1 \
@@ -277,7 +277,7 @@ export const searchPostsWithTags = async (
     } else {
       /* ============ SELF ============ */
       const query = new PS({ name: 'search-exclusive-self', text: '\
-        SELECT post, url, tags, TO_CHAR(p.date, \'YYYY-MM-DD, HH12:MI:SS AM\') date, a.username, a.name FROM posts p \
+        SELECT post, url, tags, TO_CHAR(p.date, \'Mon DD, YYYY - HH24:MI:SS\') date, a.username, a.name FROM posts p \
         INNER JOIN posts_tags pt ON pt.post_id = p.post_id \
         INNER JOIN accounts a ON a.user_id = p.user_id \
         WHERE pt.tag_id = $2 AND a.username = $1\
