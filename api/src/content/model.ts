@@ -106,16 +106,15 @@ export const getPosts = async (
   return await db.manyOrNone(query);
 };
 
-export const getDashboardPosts = async (
+export const getDashboardPosts = async ( // Basically just a search-inclusive-followed with no tags
   username: string,
 ): Promise<IPost[] | null> => {
-  const query = new PS({ name: 'get-posts', text: '\
+  const query = new PS({ name: 'get-dashboard-posts', text: '\
     SELECT post, url, tags, TO_CHAR(p.date, \'Mon DD, YYYY - HH24:MI:SS\') date, a.username, a.name FROM posts p \
     INNER JOIN follows f ON f.user_id_followed = p.user_id \
     INNER JOIN accounts a ON a.user_id = f.user_id_follower \
-    INNER JOIN accounts a2 ON a.user_id = p.user_id \
-    WHERE a.username=$1 OR a2.username=$1\
-    ORDER BY p.date desc LIMIT 10'
+    WHERE a.username = $1 \
+    ORDER BY p.date DESC LIMIT 10'
   });
 
   query.values = [username];
