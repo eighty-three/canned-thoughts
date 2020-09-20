@@ -21,7 +21,7 @@ const SearchForm = (props) => {
     setFormState
   } = props;
 
-  const [ buttonState, setButtonState ] = useState(false);
+  const [ buttonState, setButtonState ] = useState({ disabled: false, text: 'Submit' });
   const [ ifValidTags, setValidity ] = useState(true);
   const { register, handleSubmit, errors } = useForm();
   const router = useRouter();
@@ -35,14 +35,14 @@ const SearchForm = (props) => {
       tagScope: data.tagScope
     });
 
-    setButtonState(true);
+    setButtonState({ disabled: true, text: 'Searching...' });
 
     const queryTags = data.tags.trim().split(' ').join(',');
     router.push(
       `/explore?tags=${queryTags}&userScope=${data.userScope}&tagScope=${data.tagScope}&page=1`
     );
 
-    router.events.on('routeChangeComplete', () => setButtonState(false));
+    router.events.on('routeChangeComplete', () => setButtonState({ disabled: false, text: 'Submit' }));
   };
 
   return (
@@ -115,8 +115,8 @@ const SearchForm = (props) => {
         />
       </Form.Group>
 
-      <Button variant="dark" type="submit" block disabled={buttonState}>
-            Submit
+      <Button variant="dark" type="submit" block disabled={buttonState.disabled}>
+        {buttonState.text}
       </Button>
     </Form>
   );
