@@ -61,19 +61,6 @@ const Explore = (props) => {
     dispatch({ type: 'update', payload: { posts: postsPayload, page }});
   }, [tags, userScope, tagScope, page]);
 
-  const onSubmit = async (data) => {
-    setFormState({
-      tags: data.tags,
-      userScope: data.userScope,
-      tagScope: data.tagScope
-    });
-
-    const queryTags = data.tags.trim().split(' ').join(',');
-    router.push(
-      `/explore?tags=${queryTags}&userScope=${data.userScope}&tagScope=${data.tagScope}&page=1`
-    );
-  };
-
   const changePage = async (actionType) => {
     const newPage = (actionType === 'next') ? state.page + 1 : state.page - 1;
     const newPosts = await searchPosts(username, {...formState}, newPage);
@@ -95,7 +82,7 @@ const Explore = (props) => {
       <section className={utilStyles.headingMd}>
         <SearchForm
           tags={tags}
-          searchPostsFn={onSubmit}
+          setFormState={setFormState}
         />
 
         {posts &&

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/router';
 
 import utilStyles from '@/styles/utils.module.css';
 
@@ -11,22 +12,41 @@ import { checkIfValidTags } from '@/lib/content';
 
 const propTypes = {
   tags: PropTypes.string,
-  searchPostsFn: PropTypes.func
+  setFormState: PropTypes.func
 };
 
 const SearchForm = (props) => {
   const {
     tags,
-    searchPostsFn
+    setFormState
   } = props;
 
+  const [ buttonState, setButtonState ] = useState(false);
   const [ ifValidTags, setValidity ] = useState(true);
   const { register, handleSubmit, errors } = useForm();
+  const router = useRouter();
 
   const handleChange = ({ target }) => setValidity(checkIfValidTags(target.value));
 
+  const onSubmit = async (data) => {
+    setFormState({
+      tags: data.tags,
+      userScope: data.userScope,
+      tagScope: data.tagScope
+    });
+
+    setButtonState(true);
+
+    const queryTags = data.tags.trim().split(' ').join(',');
+    router.push(
+      `/explore?tags=${queryTags}&userScope=${data.userScope}&tagScope=${data.tagScope}&page=1`
+    );
+
+    router.events.on('routeChangeComplete', () => setButtonState(false));
+  };
+
   return (
-    <Form onSubmit={handleSubmit(searchPostsFn)}>
+    <Form onSubmit={handleSubmit(onSubmit)}>
       <Form.Check type="radio" inline defaultChecked readOnly ref={register({ required: true })} 
         id="user-all"
         name="userScope" 
@@ -95,7 +115,7 @@ const SearchForm = (props) => {
         />
       </Form.Group>
 
-      <Button variant="dark" type="submit" block>
+      <Button variant="dark" type="submit" block disabled={buttonState}>
             Submit
       </Button>
     </Form>
