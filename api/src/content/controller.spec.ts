@@ -80,17 +80,45 @@ describe('function calls with authentication', () => {
     });
   });
 
-  describe('searchPosts', () => {
+  describe('getDashboardPosts', () => {
     beforeAll(async () => {
       await createAccount('dummy2', '123');
-      await follows.toggleFollow('dummy', 'dummy2');
-      for (let i = 0; i < 24; i++) {
+      for (let i = 0; i < 12; i++) {
         const username = (i % 2 === 0)
           ? 'dummy'
           : 'dummy2';
-        const tags = (i < 12)
-          ? ['tag1', 'tag2', 'tag3']
-          : ['tag1'];
+        const tags = ['tag1', 'tag2', 'tag3'];
+
+        await content.createPost(username, 'post', `url${i}`, tags);
+      }
+    });
+
+    test('should work', async () => {
+      const data = { username: 'dummy' };
+      const posts = await agent.post(`${url}/dashboard`).send(data);
+
+      expect(posts.body).toHaveLength(7);
+      expect(posts.status).toStrictEqual(200);
+    });
+
+    test('should work with follow', async () => {
+      await follows.toggleFollow('dummy', 'dummy2');
+
+      const data = { username: 'dummy' };
+      const posts = await agent.post(`${url}/dashboard`).send(data);
+
+      expect(posts.body).toHaveLength(10);
+      expect(posts.status).toStrictEqual(200);
+    });
+  });
+
+  describe('searchPosts', () => {
+    beforeAll(async () => {
+      for (let i = 12; i < 24; i++) {
+        const username = (i % 2 === 0)
+          ? 'dummy'
+          : 'dummy2';
+        const tags = ['tag1'];
 
         await content.createPost(username, 'post', `url${i}`, tags);
       }
@@ -850,6 +878,42 @@ describe('searchPosts', () => {
 
     const data = { username: 'dummy', tags, options, page: 2 };
     const posts = await agent.post(`${url}/search`).send(data);
+
+    expect(posts.body).toMatchObject({error: 'You are not authenticated'});
+    expect(posts.status).toStrictEqual(401);
+  });
+});
+
+describe('getDashboardPosts', () => {
+  const agent = request(server);
+
+  test('rejected by validator, null data', async () => {
+    const data = {};
+    const posts = await agent.post(`${url}/dashboard`).send(data);
+
+    expect(posts.body).toMatchObject({error: 'Bad Request'});
+    expect(posts.status).toStrictEqual(400);
+  });
+
+  test('rejected by validator, invalid fields', async () => {
+    const data = { password: '123' };
+    const posts = await agent.post(`${url}/dashboard`).send(data);
+
+    expect(posts.body).toMatchObject({error: 'Bad Request'});
+    expect(posts.status).toStrictEqual(400);
+  });
+
+  test('rejected by validator, invalid values', async () => {
+    const data = { username: 'dummy$' };
+    const posts = await agent.post(`${url}/dashboard`).send(data);
+
+    expect(posts.body).toMatchObject({error: 'Bad Request'});
+    expect(posts.status).toStrictEqual(400);
+  });
+
+  test('valid request, no authentication', async () => {
+    const data = { username: 'dummy' };
+    const posts = await agent.post(`${url}/dashboard`).send(data);
 
     expect(posts.body).toMatchObject({error: 'You are not authenticated'});
     expect(posts.status).toStrictEqual(401);

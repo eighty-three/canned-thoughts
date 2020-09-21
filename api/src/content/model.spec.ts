@@ -1,6 +1,7 @@
 import * as content from './model';
 import { createAccount } from '../account/model';
 import * as follows from '../follows/model';
+import * as settings from '../settings/model';
 import { IOptions } from './types';
 
 beforeAll(async () => {
@@ -144,6 +145,12 @@ describe('searchPosts', () => {
       await content.createPost(user, 'post', `test${String(i)}`, tags);
     }
   });
+
+  afterAll(async () => {
+    await settings.deleteAccount('dummy');
+    await settings.deleteAccount('dummy2');
+  });
+
 
   test('searchPostsWithTags search-inclusive-all', async () => {
     expect(await content.getTag('test_tag')).toStrictEqual({ tag_id: 9 });
@@ -303,5 +310,35 @@ describe('searchPosts', () => {
     
       expect(await content.searchPostsWithTags('dummy', ['no_tag'], options, 0)).toHaveLength(0);
     });
+  });
+});
+
+describe('get dashboard posts', () => {
+  beforeAll(async () => {
+    await createAccount('dummy', '123');
+    await createAccount('dummy2', '123');
+
+    for (let i = 0; i < 15; i++) {
+      const user = (i < 10)
+        ? 'dummy'
+        : 'dummy2';
+
+      await content.createPost(user, 'post', `test${String(i)}`);
+    }
+  });
+
+  test('should return nothing', async () => {
+    expect(await content.getDashboardPosts('dummy3')).toHaveLength(0);
+  });
+
+  test('should work', async () => {
+    expect(await content.getDashboardPosts('dummy')).toHaveLength(10);
+    expect(await content.getDashboardPosts('dummy2')).toHaveLength(5);
+  });
+
+  test('should work with follow', async () => {
+    await follows.toggleFollow('dummy2', 'dummy');
+
+    expect(await content.getDashboardPosts('dummy2')).toHaveLength(10);
   });
 });
