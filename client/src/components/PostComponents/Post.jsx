@@ -43,7 +43,7 @@ const Post = (props) => {
         </a>
       </Link>
 
-      {tags &&
+      {tags && tags.length &&
         <>
           <p>TAGS:{' '}
             {tags.map((tag, idx) => {
