@@ -151,6 +151,15 @@ describe('searchPosts', () => {
     await settings.deleteAccount('dummy2');
   });
 
+  test('searchPostsWithTags search-exclusive-all with one nonexistent tag', async () => {
+    const options: IOptions = {
+      userScope: 'all',
+      tagScope: 'exclusive'
+    };
+
+    expect(await content.searchPostsWithTags('dummy', tags, options, 0)).toHaveLength(11);
+    expect(await content.searchPostsWithTags('dummy', [...tags, 'not_a_tag'], options, 0)).toHaveLength(0);
+  });
 
   test('searchPostsWithTags search-inclusive-all', async () => {
     expect(await content.getTag('test_tag')).toStrictEqual({ tag_id: 9 });
