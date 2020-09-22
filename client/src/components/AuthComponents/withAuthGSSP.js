@@ -1,10 +1,4 @@
-import PropTypes from 'prop-types';
-
 import authCheck from '@/lib/authCheck';
-
-const propTypes = {
-  getServerSidePropsFunc: PropTypes.func
-};
 
 const withAuthServerSideProps = (getServerSidePropsFunc) => {
   return async (ctx) => {
@@ -34,7 +28,5 @@ const withAuthServerSideProps = (getServerSidePropsFunc) => {
     };
   };
 };
-
-withAuthServerSideProps.propTypes = propTypes;
 
 export default withAuthServerSideProps;
