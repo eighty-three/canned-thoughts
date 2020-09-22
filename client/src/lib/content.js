@@ -2,7 +2,11 @@ import ky from 'ky-universal';
 import HOST from '@/lib/host';
 const api = `${HOST}/api/content`;
 
-export const checkIfValidTags = (tags) => {
+export const checkIfValidTags = (tags, optional) => {
+  if (!optional) {
+    if (!tags || tags.trim() === '') return false;
+  }
+
   const arr = tags.trim().split(' '); // for length
   const set = [...new Set(arr.map((tag) => tag.toLowerCase()))]; // for uniqueness
 
@@ -44,8 +48,8 @@ export const searchPosts = async (username, data, page, ctx) => {
 };
 
 export const createPost = async (username, data) => {
-  const queryData = (data.tags) 
-    ? { username, post: data.post, tags: data.tags.trim().split(' ') } 
+  const queryData = (data.tags && data.tags.trim() !== '')
+    ? { username, post: data.post, tags: data.tags.trim().split(' ') }
     : { username, post: data.post };
     
   try {

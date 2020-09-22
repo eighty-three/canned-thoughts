@@ -37,7 +37,7 @@ const PostForm = (props) => {
   const [ ifValidTags, setValidity ] = useState(true);
   const { register, handleSubmit, errors } = useForm();
 
-  const handleChange = ({ target }) => setValidity(checkIfValidTags(target.value));
+  const handleChange = ({ target }) => setValidity(checkIfValidTags(target.value, true));
 
   const onSubmit = async (data) => {
     setButtonState({ disabled: true, text: 'Sending...' });
@@ -55,7 +55,7 @@ const PostForm = (props) => {
     <Form onSubmit={handleSubmit(onSubmit)}>
       <Form.Group controlId="post">
         <Form.Label column>Write your canned thought:
-          {errors.post && 
+          {errors.post && errors.post.type !== 'required' &&
             <p className={`${utilStyles.formError}`}>{errors.post.message}</p>
           }
         </Form.Label>
@@ -102,7 +102,7 @@ const PostForm = (props) => {
               value: /^[a-zA-Z0-9 ]{1,99}$/,
               message: 'Letters and numbers only, max 100 characters. Try again'
             },
-            validate: checkIfValidTags
+            validate: (data) => checkIfValidTags(data, true)
           })} 
         />
       </Form.Group>

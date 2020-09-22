@@ -26,7 +26,11 @@ const SearchForm = (props) => {
   const { register, handleSubmit, errors } = useForm();
   const router = useRouter();
 
-  const handleChange = ({ target }) => setValidity(checkIfValidTags(target.value));
+  const handleChange = ({ target }) => {
+    (target.value || target.value !== '')
+      ? setValidity(checkIfValidTags(target.value))
+      : setValidity(true);
+  };
 
   const onSubmit = async (data) => {
     setFormState({
@@ -86,7 +90,10 @@ const SearchForm = (props) => {
 
       <Form.Group controlId="tags">
         <Form.Label column>Tags:
-          {errors.tags && ifValidTags &&
+          {errors.tags && errors.tags.type === 'required' &&
+            <p className={`${utilStyles.formError}`}>This field is required</p>
+          }
+          {errors.tags && errors.tags.type !== 'required' && ifValidTags &&
             <p className={`${utilStyles.formError}`}>{errors.tags.message}</p>
           }
           {!ifValidTags &&
