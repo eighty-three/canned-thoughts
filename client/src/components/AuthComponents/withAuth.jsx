@@ -20,7 +20,7 @@ const RedirectComponent = ({ loggedIn, protectRoute }) => {
     loadingText = 'Already logged in';
   } else if (protectRoute) {
     newPath = `/login?redirect=${prevPath}`;
-    loadingText ='Not authenticated';
+    loadingText = 'Not authenticated';
   }
 
   return (
