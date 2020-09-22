@@ -7,7 +7,6 @@ import Posts from '@/components/PostComponents/Posts';
 
 const propTypes = {
   state: PropTypes.shape({
-    page: PropTypes.number,
     posts: PropTypes.arrayOf(
       PropTypes.shape({
         username: PropTypes.string,
