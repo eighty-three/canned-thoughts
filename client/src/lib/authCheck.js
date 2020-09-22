@@ -10,7 +10,7 @@ const api = `${HOST}/api`;
 
 const secret = process.env.SECRET;
 
-const authCheck = async (ctx) => {
+export const authCheck = async (ctx) => {
   const reqCookie = ctx.req.headers.cookie;
   if (!reqCookie) return null; //No token
 
@@ -50,5 +50,3 @@ export const lightAuthCheck = async (ctx) => {
   const { username } = payload;
   return username;
 };
-
-export default authCheck;

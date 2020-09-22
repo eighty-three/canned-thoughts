@@ -1,4 +1,4 @@
-import authCheck from '@/lib/authCheck';
+import { authCheck } from '@/lib/authCheck';
 
 const withAuthServerSideProps = (getServerSidePropsFunc) => {
   return async (ctx) => {
