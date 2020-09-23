@@ -50,7 +50,6 @@ const ProfileInfoForm = (props) => {
 
       <div className={`w-75 mx-auto ${utilStyles.pd20}`}>
         <Form className="mx-auto" onSubmit={handleSubmit(onSubmit)}>
-
           <Form.Group controlId='formProfileName'>
             <Form.Label>Name:
               {errors.newName &&
@@ -99,7 +98,6 @@ const ProfileInfoForm = (props) => {
           <Button onBlur={revertButtonState} variant="dark" type="submit" block disabled={buttonState.disabled}>
             {buttonState.text}
           </Button>
-
         </Form>
       </div>
     </>
