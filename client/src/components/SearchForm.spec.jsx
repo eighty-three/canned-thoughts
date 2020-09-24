@@ -21,8 +21,6 @@ jest.mock('next/router', () => ({
 }));
 
 describe('component', () => {
-
-
   const mockFn = jest.fn();
   const data = {
     tags: 'test tags',
