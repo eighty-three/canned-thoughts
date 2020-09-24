@@ -7,7 +7,7 @@ import { toggleFollowStatus } from '@/lib/follows';
 const propTypes = {
   username: PropTypes.string,
   name: PropTypes.string,
-  description: PropTypes. string,
+  description: PropTypes.string,
   followers: PropTypes.number,
   loggedInUsername: PropTypes.string,
   followStatus: PropTypes.bool
