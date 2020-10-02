@@ -28,7 +28,6 @@ export const login = async (prevPath, data) => {
     ? '/dashboard'
     : prevPath.redirect;
 
-
   try {
     const req = await ky.post(`${api}/login`, { json: {...data}, throwHttpErrors: false });
     const response = await req.json();
