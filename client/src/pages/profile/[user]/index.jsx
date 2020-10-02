@@ -21,7 +21,6 @@ const propTypes = {
     description: PropTypes.string,
     followers: PropTypes.number,
     followStatus: PropTypes.bool,
-    date: PropTypes.date
   }),
   profileUsername: PropTypes.string,
   posts: PropTypes.arrayOf(
