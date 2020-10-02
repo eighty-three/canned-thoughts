@@ -20,8 +20,7 @@ const propTypes = {
   username: PropTypes.string,
   profileInfo: PropTypes.shape({
     name: PropTypes.string,
-    description: PropTypes.string,
-    username: PropTypes.string
+    description: PropTypes.string
   })
 };
 
