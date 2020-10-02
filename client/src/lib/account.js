@@ -35,7 +35,7 @@ export const login = async (prevPath, data) => {
     if (response.error) {
       return response;
     } else {
-      Router.replace(`${newPath}`);
+      Router.replace(newPath);
     }
   } catch (err) {
     return { error: 'Something went wrong' };
