@@ -99,4 +99,26 @@ describe('component', () => {
     expect(container).toHaveTextContent(`Name:${nameError}`);
     expect(container).toHaveTextContent(`Description:${descError}`);
   });
+
+  test('submit works, error from backend', async () => {
+    profile.updateProfileInfo = jest.fn().mockResolvedValue({ error: 'something went wrong' });
+
+    const { getByRole, getByLabelText } = render(<ProfileInfoForm {...data} />);
+    const nameInput = getByLabelText('Name:');
+    const descInput = getByLabelText('Description:');
+    const submitButton = getByRole('button', { name: 'Update Profile Info' });
+
+    expect(screen.getByRole('button', { name: 'Update Profile Info' })).toBeInTheDocument();
+
+    await act(async () => {
+      await userEvent.type(nameInput, ' testing input');
+      await userEvent.type(descInput, ' testing input');
+      fireEvent.click(submitButton);
+    });
+
+    expect(profile.updateProfileInfo).toHaveBeenCalled();
+
+    expect(screen.queryByRole('button', { name: 'Update Profile Info' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'something went wrong' })).toBeInTheDocument();
+  });
 });
