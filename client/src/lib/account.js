@@ -20,7 +20,8 @@ export const signup = async (data) => {
 
 export const login = async (prevPath, data) => {
   const newPath = (
-    prevPath.redirect == undefined
+    !prevPath
+    || !prevPath.redirect
     || prevPath.redirect.substr(0, 5) === '/api/'
     || prevPath.redirect[0] !== '/'
   )
