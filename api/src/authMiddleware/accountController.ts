@@ -4,13 +4,6 @@ import * as argon2 from 'argon2';
 
 export const verifyUser: RequestHandler = async (req, res) => {
   const { username } = req.body;
-
-  const user = await account.checkUsername(username);
-  if (!user) {
-    res.status(409).json({error: 'Username not found'});
-    return;
-  }
-
   res.status(200).json({ username });
 };
 
