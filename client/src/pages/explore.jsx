@@ -106,7 +106,9 @@ export const getServerSideProps = withAuthServerSideProps(async (ctx, username) 
     tags = (tempArr.length <= 3) ? tempArr.join(' ') : null;
   }
 
-  const userScope = (ctx.query.userScope === ('followed' || 'all' || 'self')) ? ctx.query.userScope : 'all';
+  const userScopes = ['followed', 'all', 'self'];
+
+  const userScope = (userScopes.indexOf(ctx.query.userScope) !== -1) ? ctx.query.userScope : 'all';
   const tagScope = (ctx.query.tagScope === 'exclusive') ? 'exclusive' : 'inclusive';
 
   const page = (Number(ctx.query.page) > 1) ? Number(ctx.query.page) : 1;
